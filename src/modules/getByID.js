@@ -1,9 +1,5 @@
-const {
-  fetchHTML,
-  querySelectorAllRegex,
-  findElementByInnerHTML,
-} = require("./utils");
-const { JSDOM } = require("jsdom");
+const { fetchHTML, querySelectorAllRegex } = require("./utils");
+
 /**
  * Get more information about a manga based on its id. title, author, poster, genres, chapters, description, read direction, status, score. the id can be found with searchByKeyword.
  * @param {string} id the id of the manga.

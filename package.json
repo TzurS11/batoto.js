@@ -1,6 +1,6 @@
 {
   "name": "batoto.js",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Scrape data from bato.to",
   "main": "./src/index.js",
   "scripts": {

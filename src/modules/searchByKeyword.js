@@ -1,8 +1,4 @@
-const { fetchHTML, querySelectorAllRegex, convert } = require("./utils");
-
-let options = {
-  ogLang: "Japanese",
-};
+const { fetchHTML, querySelectorAllRegex } = require("./utils");
 
 /**
  * Get list of mangas from a keyword. Example: Kimetsu no Yaiba, Demon Slayer
@@ -72,9 +68,27 @@ async function searchByKeyword(keyword, page = 1) {
             .replace(/<\/span>/g, "")
         );
       }
+
+      const authors = querySelectorAllRegex(
+        matchingElements[i],
+        "data-hk",
+        /0-0-3-\d*-4-1-\d*-0/
+      );
+      let currentAuthors = [];
+      for (let i = 0; i < authors.length; i++) {
+        let currentSpan = authors[i];
+        if (currentSpan.innerHTML != " / ")
+          currentAuthors.push(
+            currentSpan.innerHTML
+              .replace(/<span class="highlight-text">/g, "")
+              .replace(/<\/span>/g, "")
+          );
+      }
+
       list.push({
         id: id,
         title: { original: titleOriginal, synonyms: currentSyns },
+        authors: currentAuthors,
         poster:
           poster == "/public-assets/img/no-image.png"
             ? "https://bato.to/public-assets/img/no-image.png"

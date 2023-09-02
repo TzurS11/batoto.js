@@ -27,15 +27,17 @@ async function getByID(id) {
       synonymsArray.push(currentSpan.innerHTML);
   }
 
-  let authors = document
-    .querySelector(
-      "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > div.mt-2.text-sm.md\\:text-base.opacity-80"
-    )
-    .getElementsByTagName("a");
+  let authorsQuerySelector = document.querySelector(
+    "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > div.mt-2.text-sm.md\\:text-base.opacity-80"
+  );
   let authorsArray = [];
-  for (let i = 0; i < authors.length; i++) {
-    let currentA = authors.item(i);
-    authorsArray.push(currentA.innerHTML.replace("<!-- -->", ""));
+  if (authorsQuerySelector != null) {
+    let authors = authorsQuerySelector.getElementsByTagName("a");
+
+    for (let i = 0; i < authors.length; i++) {
+      let currentA = authors.item(i);
+      authorsArray.push(currentA.innerHTML.replace("<!-- -->", ""));
+    }
   }
 
   let genres = document
@@ -77,7 +79,12 @@ async function getByID(id) {
 
   let description = document.querySelector(
     "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.mt-3.md\\:mt-0.md\\:pl-3.grow.grid.gap-3.grid-cols-1.lg\\:grid-cols-3 > div.lg\\:col-span-3 > astro-island > div > div.max-h-28.overflow-y-hidden > astro-slot > div > astro-island:nth-child(1) > div > div > div > div > p"
-  ).innerHTML;
+  );
+  if (description != null) {
+    description = description.innerHTML;
+  } else {
+    description = "";
+  }
 
   let score = document
     .querySelector(
@@ -90,11 +97,19 @@ async function getByID(id) {
     .getElementsByClassName("font-bold uppercase")
     .item(0).innerHTML;
 
-  let readDirection = document.querySelector('[name="arrow-right"]');
-  if (readDirection != null) {
-    readDirection = "Left to Right";
-  } else {
-    readDirection = "Right to Left";
+  let readDirection = querySelectorAllRegex(document, "name", /arrow-\w*/g);
+  switch (readDirection[0].getAttribute("name")) {
+    case "arrow-right":
+      readDirection = "Left to Right";
+      break;
+    case "arrow-left":
+      readDirection = "Right to Left";
+      break;
+    case "arrow-down":
+      readDirection = "Top to Bottom";
+      break;
+    default:
+      readDirection = "";
   }
 
   return {

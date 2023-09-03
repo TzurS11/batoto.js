@@ -51,7 +51,35 @@ async function getByID(id) {
     if (currentSpan.innerHTML.includes('<span class="">')) {
       genresArray.push(currentSpan.querySelector('[class=""]').innerHTML);
     }
+    if (currentSpan.innerHTML.includes('<span class="font-bold">')) {
+      genresArray.push(
+        currentSpan.querySelector('[class="font-bold"]').innerHTML
+      );
+    }
+    if (
+      currentSpan.innerHTML.includes(
+        '<span class="font-bold border-b border-b-primary">'
+      )
+    ) {
+      genresArray.push(
+        currentSpan.querySelector(
+          '[class="font-bold border-b border-b-primary"]'
+        ).innerHTML
+      );
+    }
+    if (
+      currentSpan.innerHTML.includes(
+        '<span class="font-bold border-b border-b-warning">'
+      )
+    ) {
+      genresArray.push(
+        currentSpan.querySelector(
+          '[class="font-bold border-b border-b-warning"]'
+        ).innerHTML
+      );
+    }
   }
+
   let chaptersArray = [];
   let chaptersDivs = querySelectorAllRegex(
     document.querySelector(
@@ -98,19 +126,27 @@ async function getByID(id) {
     .item(0).innerHTML;
 
   let readDirection = querySelectorAllRegex(document, "name", /arrow-\w*/g);
-  switch (readDirection[0].getAttribute("name")) {
-    case "arrow-right":
-      readDirection = "Left to Right";
-      break;
-    case "arrow-left":
-      readDirection = "Right to Left";
-      break;
-    case "arrow-down":
-      readDirection = "Top to Bottom";
-      break;
-    default:
-      readDirection = "";
+  if (readDirection.length == 0) {
+    readDirection = "";
+  } else {
+    switch (readDirection[0].getAttribute("name")) {
+      case "arrow-right":
+        readDirection = "Left to Right";
+        break;
+      case "arrow-left":
+        readDirection = "Right to Left";
+        break;
+      case "arrow-down":
+        readDirection = "Top to Bottom";
+        break;
+      default:
+        readDirection = "";
+    }
   }
+
+  let isMature = false;
+  if (genresArray.includes("Mature") || genresArray.includes("Smut"))
+    isMature = true;
 
   return {
     title: { original: titleOriginal, synonyms: synonymsArray },
@@ -122,6 +158,7 @@ async function getByID(id) {
     readDirection: readDirection,
     status: status,
     score: score,
+    mature: isMature,
   };
 }
 

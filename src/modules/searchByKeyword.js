@@ -85,6 +85,9 @@ async function searchByKeyword(keyword, page = 1) {
           );
       }
 
+      let isMature = false;
+      if (currentGenres.includes("Mature") || currentGenres.includes("Smut")) isMature = true;
+
       list.push({
         id: id,
         title: { original: titleOriginal, synonyms: currentSyns },
@@ -94,6 +97,7 @@ async function searchByKeyword(keyword, page = 1) {
             ? "https://bato.to/public-assets/img/no-image.png"
             : String(poster),
         genres: currentGenres,
+        mature: isMature,
       });
     }
     let numOfPages = 0;

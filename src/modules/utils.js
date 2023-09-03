@@ -6,10 +6,15 @@ const axios = require("axios");
  * @returns
  */
 async function fetchHTML(url) {
-  const response = await axios.get(url);
-  const dom = new JSDOM(response.data);
-  const document = dom.window.document;
-  return document;
+  try {
+    const response = await axios.get(url);
+    response.status;
+    const dom = new JSDOM(response.data);
+    const document = dom.window.document;
+    return document;
+  } catch {
+    return null;
+  }
 }
 /**
  *
@@ -33,6 +38,5 @@ function querySelectorAllRegex(document, attribute, regex) {
   );
   return matchingElements;
 }
-
 
 module.exports = { fetchHTML, querySelectorAllRegex };

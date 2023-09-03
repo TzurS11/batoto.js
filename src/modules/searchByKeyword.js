@@ -10,6 +10,9 @@ async function searchByKeyword(keyword, page = 1) {
     let document = await fetchHTML(
       `https://bato.to/v3x-search?word=${keyword}&orig=&lang=ja,ko,zh,en&sort=field_follow&page=${page}`
     );
+    if (document == null) {
+      return { valid: false };
+    }
     const matchingElements = querySelectorAllRegex(
       document.querySelector('[data-hk="0-0-2"]'),
       "data-hk",

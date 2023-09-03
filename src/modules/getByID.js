@@ -6,6 +6,9 @@ const { fetchHTML, querySelectorAllRegex } = require("./utils");
  */
 async function getByID(id) {
   const document = await fetchHTML(`https://bato.to/title/${id}`);
+  if (document == null) {
+    return { valid: false };
+  }
 
   const titleOriginal = document.querySelector(
     "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > h3 > a"
@@ -149,6 +152,7 @@ async function getByID(id) {
     isMature = true;
 
   return {
+    valid: true,
     title: { original: titleOriginal, synonyms: synonymsArray },
     poster: poster,
     authors: authorsArray,

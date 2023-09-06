@@ -18,17 +18,21 @@ async function getByID(id) {
     "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.w-24.md\\:w-52.flex-none.justify-start.items-start > img"
   ).src;
 
-  let synonyms = document
+  let synonymsQuery = document
     .querySelector(
       "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > div.mt-1.text-xs.md\\:text-base.opacity-80"
     )
-    .getElementsByTagName("span");
+    // .getElementsByTagName("span");
   let synonymsArray = [];
-  for (let i = 0; i < synonyms.length; i++) {
-    let currentSpan = synonyms.item(i);
-    if (currentSpan.innerHTML != " / ")
-      synonymsArray.push(currentSpan.innerHTML);
+  if(synonymsQuery != null){
+    let synonyms = synonymsQuery.getElementsByTagName("span")
+    for (let i = 0; i < synonyms.length; i++) {
+      let currentSpan = synonyms.item(i);
+      if (currentSpan.innerHTML != " / ")
+        synonymsArray.push(currentSpan.innerHTML);
+    }
   }
+ 
 
   let authorsQuerySelector = document.querySelector(
     "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > div.mt-2.text-sm.md\\:text-base.opacity-80"

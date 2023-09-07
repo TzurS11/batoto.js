@@ -1,5 +1,6 @@
 const { JSDOM } = require("jsdom");
 const axios = require("axios");
+
 /**
  * get the html of the url as a document.
  * @param {string} url The website you want to fetch
@@ -17,7 +18,7 @@ async function fetchHTML(url) {
   }
 }
 /**
- *
+ * regex search an attribute inside a document.
  * @param {Document} document
  * @param {string} attribute
  * @param {RegExp} regex
@@ -39,4 +40,17 @@ function querySelectorAllRegex(document, attribute, regex) {
   return matchingElements;
 }
 
-module.exports = { fetchHTML, querySelectorAllRegex };
+/**
+ * Check if the manga is mature by genres.
+ * @param {String[]} genres
+ */
+function isMature(genres) {
+  let NSFWgenres = ["mature", "smut"];
+  for (let i = 0; i < genres.length; i++) {
+    let genre = genres[i].toLowerCase();
+    if (NSFWgenres.includes(genre)) return true;
+  }
+  return false;
+}
+
+module.exports = { fetchHTML, querySelectorAllRegex, isMature };

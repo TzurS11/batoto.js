@@ -85,7 +85,8 @@ app.get("/getByID/:id", async function (req, res) {
 // http://localhost:8080/getByID/82182-kimetsu-no-yaiba-official
 
 app.get("/getChapterByID/:id", async function (req, res) {
-  const id = req.params.id;
+  const id = req.params.id.replace(/%2F/g,"/");
+  // turning %2F back to / because the function expects the id with /
 
   const chapter = await getChapterByID(id);
   if (!chapter.successful) {

@@ -89,7 +89,7 @@ app.get("/getChapterByID/:id", async function (req, res) {
   // turning %2F back to / because the function expects the id with /
 
   const chapter = await getChapterByID(id);
-  if (!chapter.successful) {
+  if (!chapter.valid) {
     return res.status(404).send({ error: "Failed to get chapter" });
   }
   return res.status(200).send(chapter);

@@ -1,13 +1,15 @@
 const axios = require("axios");
+const { isMature } = require("./utils");
 
 /**
  * Get random mangas
+ * @param {string} baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
  * @returns
  */
-async function getRandom() {
+async function getRandom(baseURL = "https://bato.to") {
   try {
     const response = await axios.post(
-      "https://bato.to/apo/",
+      `${baseURL}/apo/`,
       {
         query: `
           query get_content_searchComic($select: SearchComic_Select) {
@@ -148,7 +150,7 @@ async function getRandom() {
       {
         headers: {
           "Content-Type": "application/json",
-          Referer: "https://bato.to/v3x-random",
+          Referer: `${baseURL}/v3x-random`,
         },
       }
     );
@@ -157,29 +159,30 @@ async function getRandom() {
     const list = [];
     for (let i = 0; i < randomComics.length; i++) {
       const manga = randomComics[i].data;
-      const isMature = manga.genres.includes("mature");
+      let mature = false;
+      const genres = Array.from(manga.genres, String);
+      if (isMature(genres)) mature = true;
       list.push({
-        id: manga.urlPath.replace("/title/", ""),
+        id: String(manga.urlPath).replace("/title/", ""),
         title: {
-          original: manga.name,
-          synonyms: manga.altNames,
+          original: String(manga.name),
+          synonyms: Array.from(manga.altNames, String),
         },
-        authors: manga.authors,
-        poster: manga.urlCoverOri,
-        genres: manga.genres,
-        mature: isMature,
+        authors: Array.from(manga.authors, String),
+        poster: String(manga.urlCoverOri),
+        genres: genres,
+        mature: mature,
       });
     }
 
     return {
+      url: `${baseURL}/apo/`,
       valid: true,
       results: list,
-      pages: response.data.data.get_content_searchComic.paging.pages,
     };
   } catch (e) {
-    console.log(e.message);
-    return { valid: false };
-    return null;
+    console.error(e.message);
+    return { url: `${baseURL}/apo/`, valid: false };
   }
 }
 

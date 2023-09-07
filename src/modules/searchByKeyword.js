@@ -1,14 +1,15 @@
-const { fetchHTML, querySelectorAllRegex } = require("./utils");
+const { fetchHTML, querySelectorAllRegex, isMature } = require("./utils");
 
 /**
  * Get list of mangas from a keyword. Example: Kimetsu no Yaiba, Demon Slayer
  * @param {string} keyword The text value.
  * @param {number} page If there are too many results to fit in one page you can access another page. Get amount of pages by calling this command with page param set to 1 or dont type anything as the param
+ * @param {string} baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
  */
-async function searchByKeyword(keyword, page = 1) {
+async function searchByKeyword(keyword, page = 1, baseURL = "https://bato.to") {
   try {
     let document = await fetchHTML(
-      `https://bato.to/v3x-search?word=${keyword}&orig=&lang=ja,ko,zh,en&sort=field_follow&page=${page}`
+      `${baseURL}/v3x-search?word=${keyword}&orig=&lang=ja,ko,zh,en&sort=field_follow&page=${page}`
     );
     if (document == null) {
       return { valid: false };
@@ -88,8 +89,8 @@ async function searchByKeyword(keyword, page = 1) {
           );
       }
 
-      let isMature = false;
-      if (currentGenres.includes("Mature") || currentGenres.includes("Smut")) isMature = true;
+      let mature = false;
+      if (isMature(currentGenres)) mature = true;
 
       list.push({
         id: id,
@@ -97,10 +98,10 @@ async function searchByKeyword(keyword, page = 1) {
         authors: currentAuthors,
         poster:
           poster == "/public-assets/img/no-image.png"
-            ? "https://bato.to/public-assets/img/no-image.png"
+            ? `${baseURL}/public-assets/img/no-image.png`
             : String(poster),
         genres: currentGenres,
-        mature: isMature,
+        mature: mature,
       });
     }
     let numOfPages = 0;
@@ -109,6 +110,7 @@ async function searchByKeyword(keyword, page = 1) {
       numOfPages = pageAs[pageAs.length - 1].innerHTML;
     }
     return {
+      url: `${baseURL}/v3x-search?word=${keyword}&orig=&lang=ja,ko,zh,en&sort=field_follow&page=${page}`,
       valid:
         document.querySelector(
           "#app-wrapper > main > div:nth-child(3) > button"
@@ -117,7 +119,11 @@ async function searchByKeyword(keyword, page = 1) {
       pages: Number(numOfPages),
     };
   } catch (e) {
-    console.log(e.message);
+    console.error(e);
+    return {
+      url: `${baseURL}/v3x-search?word=${keyword}&orig=&lang=ja,ko,zh,en&sort=field_follow&page=${page}`,
+      valid: false,
+    };
   }
 }
 

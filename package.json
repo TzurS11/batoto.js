@@ -1,6 +1,6 @@
 {
   "name": "batoto.js",
-  "version": "1.6.3",
+  "version": "1.7.0",
   "description": "Scrape data from bato.to",
   "main": "./src/index.js",
   "scripts": {
@@ -29,6 +29,10 @@
     "lezhin",
     "manhwa",
     "manhua",
-    "comics"
+    "comics",
+    "anime",
+    "api",
+    "bato.to api",
+    "batoto api"
   ]
 }

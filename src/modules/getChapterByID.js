@@ -20,7 +20,7 @@ async function getChapterByID(chapterID) {
         }
       }
     }
-    return { valid: false, pages: pages };
+    return { valid: true, pages: pages };
   } catch (error) {
     return { valid: false, pages: [] };
   }

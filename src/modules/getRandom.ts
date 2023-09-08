@@ -1,13 +1,18 @@
-const axios = require("axios");
-const { isMature } = require("./utils");
+import axios from "axios";
+import { isMature, sources } from "./utils";
+
+type options = {
+  baseURL: sources;
+};
 
 /**
  * Get random mangas
- * @param {Object} options Options for getting the information.
- * @param {import("./utils").sources} options.baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
+ * @param options Options for getting the information.
  * @returns
  */
-async function getRandom(options = {}) {
+export async function getRandom(
+  options: options = { baseURL: "https://bato.to" }
+) {
   const baseURL = options.baseURL || "https://bato.to";
   try {
     const response = await axios.post(
@@ -182,10 +187,8 @@ async function getRandom(options = {}) {
       valid: true,
       results: list,
     };
-  } catch (e) {
-    console.error(e.message);
+  } catch (error: any) {
+    console.error(error.message);
     return { url: `${baseURL}/apo/`, valid: false };
   }
 }
-
-module.exports = getRandom;

@@ -1,46 +1,60 @@
-const {
-  fetchHTML,
-  querySelectorAllRegex,
-  isMature,
-} = require("./utils");
+import { fetchHTML, querySelectorAllRegex, isMature, sources } from "./utils";
+
+type options = {
+  page: number;
+  baseURL: sources;
+};
 
 /**
  * Get list of mangas from a keyword. Example: Kimetsu no Yaiba, Demon Slayer
- * @param {string} keyword The text value.
- * @param {number} page If there are too many results to fit in one page you can access another page. Get amount of pages by calling this command with page param set to 1 or dont type anything as the param
- * @param {Object} options Options for getting the information.
- * @param {number} options.page If there are multiple pages for the same keyword then you can go to the next page by passing the number here
- * @param {import("./utils").sources} options.baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
+ * @param keyword The text value.
+ * @param options Options for getting the information.
  */
-async function searchByKeyword(keyword, options = {}) {
+export async function searchByKeyword(
+  keyword: string,
+  options: options = { baseURL: "https://bato.to", page: 1 }
+) {
   const baseURL = options.baseURL || "https://bato.to";
   const page = options.page || 1;
   try {
+    const list: {
+      id: string;
+      title: { original: string; synonyms: string[] };
+      authors: string[];
+      poster: string;
+      genres: string[];
+      mature: boolean;
+    }[] = [];
+
     let document = await fetchHTML(
       `${baseURL}/v3x-search?word=${keyword}&lang=ja,ko,zh,en&sort=field_follow&page=${page}`
     );
     if (document == null) {
       return { valid: false };
     }
+    document.getElementsByTagName("img");
     const matchingElements = querySelectorAllRegex(
-      document.querySelector('[data-hk="0-0-2"]'),
+      document.querySelector('[data-hk="0-0-2"]') as Element,
       "data-hk",
       /0-0-3-\d*-0/
     );
     const pages = document.querySelector('[data-hk="0-0-4-0-0"]');
-    let list = [];
     for (let i = 0; i < matchingElements.length; i++) {
-      const poster = querySelectorAllRegex(
-        matchingElements[i],
-        "data-hk",
-        /0-0-3-\d*-1-1-0/
-      )[0].src;
+      let poster = (
+        querySelectorAllRegex(
+          matchingElements[i],
+          "data-hk",
+          /0-0-3-\d*-1-1-0/
+        )[0] as HTMLImageElement
+      ).src;
 
-      const id = querySelectorAllRegex(
-        matchingElements[i],
-        "data-hk",
-        /0-0-3-\d*-1-1-0/
-      )[0].parentElement.href.split("/")[2];
+      const id = (
+        querySelectorAllRegex(
+          matchingElements[i],
+          "data-hk",
+          /0-0-3-\d*-1-1-0/
+        )[0].parentElement as HTMLAnchorElement
+      ).href.split("/")[2];
 
       const titleOriginal = querySelectorAllRegex(
         matchingElements[i],
@@ -55,7 +69,7 @@ async function searchByKeyword(keyword, options = {}) {
         "data-hk",
         /0-0-3-\d*-3-1-\d*-0/
       );
-      let currentSyns = [];
+      let currentSyns: string[] = [];
       for (let i = 0; i < titleSynonyms.length; i++) {
         let currentSpan = titleSynonyms[i];
         if (currentSpan.innerHTML != " / ")
@@ -71,7 +85,7 @@ async function searchByKeyword(keyword, options = {}) {
         "data-hk",
         /0-0-3-\d*-6-2-\d*-3-0/
       );
-      let currentGenres = [];
+      let currentGenres: string[] = [];
       for (let i = 0; i < genres.length; i++) {
         let currentSpan = genres[i];
         currentGenres.push(
@@ -86,7 +100,7 @@ async function searchByKeyword(keyword, options = {}) {
         "data-hk",
         /0-0-3-\d*-4-1-\d*-0/
       );
-      let currentAuthors = [];
+      let currentAuthors: string[] = [];
       for (let i = 0; i < authors.length; i++) {
         let currentSpan = authors[i];
         if (currentSpan.innerHTML != " / ")
@@ -99,7 +113,6 @@ async function searchByKeyword(keyword, options = {}) {
 
       let mature = false;
       if (isMature(currentGenres)) mature = true;
-
       list.push({
         id: id,
         title: { original: titleOriginal, synonyms: currentSyns },
@@ -115,7 +128,7 @@ async function searchByKeyword(keyword, options = {}) {
     let numOfPages = 0;
     if (pages != null) {
       let pageAs = querySelectorAllRegex(pages, "data-hk", /0-0-4-0-1-\d*-2-0/);
-      numOfPages = pageAs[pageAs.length - 1].innerHTML;
+      numOfPages = Number(pageAs[pageAs.length - 1].innerHTML);
     }
     return {
       url: `${baseURL}/v3x-search?word=${keyword}&orig=&lang=ja,ko,zh,en&sort=field_follow&page=${page}`,
@@ -124,7 +137,7 @@ async function searchByKeyword(keyword, options = {}) {
           "#app-wrapper > main > div:nth-child(3) > button"
         ) == null,
       results: list,
-      pages: Number(numOfPages),
+      pages: numOfPages,
     };
   } catch (e) {
     console.error(e);
@@ -134,5 +147,6 @@ async function searchByKeyword(keyword, options = {}) {
     };
   }
 }
+searchByKeyword("jinx");
 
-module.exports = searchByKeyword;
+// module.exports = searchByKeyword;

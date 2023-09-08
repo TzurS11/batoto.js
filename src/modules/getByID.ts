@@ -1,13 +1,19 @@
-const { fetchHTML, querySelectorAllRegex, isMature } = require("./utils");
+import { fetchHTML, querySelectorAllRegex, isMature, sources } from "./utils";
+
+type options = {
+  baseURL: sources;
+};
 
 /**
  * Get more information about a manga based on its id. title, author, poster, genres, chapters, description, read direction, status, score. the id can be found with searchByKeyword.
- * @param {string} id the id of the manga.
- * @param {Object} options Options for getting the information
- * @param {import("./utils").sources} options.baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
+ * @param id the id of the manga.
+ * @param  options Options for getting the information
  */
 // * @param {string} baseURL
-async function getByID(id, options = {}) {
+export async function getByID(
+  id: string,
+  options: options = { baseURL: "https://bato.to" }
+) {
   const baseURL = options.baseURL || "https://bato.to";
   try {
     const document = await fetchHTML(`${baseURL}/title/${id}`);
@@ -15,82 +21,108 @@ async function getByID(id, options = {}) {
       return { valid: false, url: `${baseURL}/title/${id}` };
     }
 
-    let titleOriginal = document.querySelector(
+    let titleOriginal: Element | string | null = document.querySelector(
       "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > h3 > a"
     );
     if (titleOriginal == null) {
       return { valid: false, url: `${baseURL}/title/${id}` };
     }
-    titleOriginal = document.querySelector(
-      "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > h3 > a"
+    titleOriginal = (
+      document.querySelector(
+        "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > h3 > a"
+      ) as Element
     ).innerHTML;
 
-    const poster = document.querySelector(
-      "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.w-24.md\\:w-52.flex-none.justify-start.items-start > img"
+    const poster: Element | string | null = (
+      document.querySelector(
+        "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.w-24.md\\:w-52.flex-none.justify-start.items-start > img"
+      ) as HTMLImageElement
     ).src;
 
     let synonymsQuery = document.querySelector(
       "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > div.mt-1.text-xs.md\\:text-base.opacity-80"
     );
     // .getElementsByTagName("span");
-    let synonymsArray = [];
+    let synonymsArray: string[] = [];
     if (synonymsQuery != null) {
       let synonyms = synonymsQuery.getElementsByTagName("span");
       for (let i = 0; i < synonyms.length; i++) {
         let currentSpan = synonyms.item(i);
-        if (currentSpan.innerHTML != " / ")
-          synonymsArray.push(currentSpan.innerHTML);
+        if ((currentSpan as HTMLSpanElement).innerHTML != " / ")
+          synonymsArray.push((currentSpan as HTMLSpanElement).innerHTML);
       }
     }
 
     let authorsQuerySelector = document.querySelector(
       "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > div.mt-2.text-sm.md\\:text-base.opacity-80"
     );
-    let authorsArray = [];
+    let authorsArray: string[] = [];
     if (authorsQuerySelector != null) {
       let authors = authorsQuerySelector.getElementsByTagName("a");
 
       for (let i = 0; i < authors.length; i++) {
         let currentA = authors.item(i);
-        authorsArray.push(currentA.innerHTML.replace("<!-- -->", ""));
+        authorsArray.push(
+          (currentA as HTMLAnchorElement).innerHTML.replace("<!-- -->", "")
+        );
       }
     }
 
-    let genres = document
-      .querySelector(
+    let genres = (
+      document.querySelector(
         "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.mt-3.md\\:mt-0.md\\:pl-3.grow.grid.gap-3.grid-cols-1.lg\\:grid-cols-3 > div:nth-child(2) > div.flex.items-center.flex-wrap"
-      )
-      .getElementsByTagName("span");
-    let genresArray = [];
+      ) as Element
+    ).getElementsByTagName("span");
+    let genresArray: string[] = [];
     for (let i = 0; i < genres.length; i++) {
       let currentSpan = genres.item(i);
-      if (currentSpan.innerHTML.includes('<span class="">')) {
-        genresArray.push(currentSpan.querySelector('[class=""]').innerHTML);
-      }
-      if (currentSpan.innerHTML.includes('<span class="font-bold">')) {
-        genresArray.push(
-          currentSpan.querySelector('[class="font-bold"]').innerHTML
-        );
-      }
       if (
-        currentSpan.innerHTML.includes(
-          '<span class="font-bold border-b border-b-primary">'
-        )
+        (currentSpan as HTMLSpanElement).innerHTML.includes('<span class="">')
       ) {
         genresArray.push(
-          currentSpan.querySelector(
-            '[class="font-bold border-b border-b-primary"]'
+          (
+            (currentSpan as HTMLSpanElement).querySelector(
+              '[class=""]'
+            ) as Element
           ).innerHTML
         );
       }
       if (
-        currentSpan.innerHTML.includes(
+        (currentSpan as HTMLSpanElement).innerHTML.includes(
+          '<span class="font-bold">'
+        )
+      ) {
+        genresArray.push(
+          (
+            (currentSpan as HTMLSpanElement).querySelector(
+              '[class="font-bold"]'
+            ) as Element
+          ).innerHTML
+        );
+      }
+      if (
+        (currentSpan as HTMLSpanElement).innerHTML.includes(
+          '<span class="font-bold border-b border-b-primary">'
+        )
+      ) {
+        genresArray.push(
+          (
+            (currentSpan as HTMLSpanElement).querySelector(
+              '[class="font-bold border-b border-b-primary"]'
+            ) as Element
+          ).innerHTML
+        );
+      }
+      if (
+        (currentSpan as HTMLSpanElement).innerHTML.includes(
           '<span class="font-bold border-b border-b-warning">'
         )
       ) {
         genresArray.push(
-          currentSpan.querySelector(
-            '[class="font-bold border-b border-b-warning"]'
+          (
+            (currentSpan as HTMLSpanElement).querySelector(
+              '[class="font-bold border-b border-b-warning"]'
+            ) as Element
           ).innerHTML
         );
       }
@@ -100,7 +132,7 @@ async function getByID(id, options = {}) {
     let chaptersDivs = querySelectorAllRegex(
       document.querySelector(
         "#app-wrapper > main > div:nth-child(3) > astro-island > div > div:nth-child(2) > div.scrollable-panel.border-base-300\\/50.border.border-r-2.max-h-\\[380px\\].lg\\:max-h-\\[500px\\] > div"
-      ),
+      ) as Element,
       "data-hk",
       /0-0-\d*-0/
     );
@@ -116,12 +148,12 @@ async function getByID(id, options = {}) {
       if (chapter != null) {
         chaptersArray.push({
           name: chapter.innerHTML,
-          id: chapter.href.replace("/title/", ""),
+          id: (chapter as HTMLAnchorElement).href.replace("/title/", ""),
         });
       }
     }
 
-    let description = document.querySelector(
+    let description: Element | null | string = document.querySelector(
       "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.mt-3.md\\:mt-0.md\\:pl-3.grow.grid.gap-3.grid-cols-1.lg\\:grid-cols-3 > div.lg\\:col-span-3 > astro-island > div > div.max-h-28.overflow-y-hidden > astro-slot > div > astro-island:nth-child(1) > div > div > div > div > p"
     );
     if (description != null) {
@@ -130,18 +162,23 @@ async function getByID(id, options = {}) {
       description = "";
     }
 
-    let score = document
-      .querySelector(
+    let score = (
+      document.querySelector(
         "#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.mt-3.md\\:mt-0.md\\:pl-3.grow.grid.gap-3.grid-cols-1.lg\\:grid-cols-3 > div.md\\:max-lg\\:grid.md\\:max-lg\\:grid-cols-2.md\\:max-lg\\:gap-3 > div:nth-child(1) > div > div.flex.flex-col.justify-start.items-center > div.leading-\\[2\\.0rem\\].md\\:leading-\\[2\\.5rem\\].border-b.border-base-200\\/60.mb-1 > span"
-      )
-      .innerHTML.replace(/<!-- -->/g, "")
+      ) as Element
+    ).innerHTML
+      .replace(/<!-- -->/g, "")
       .replace("&lt;", "<");
 
-    let status = document
-      .getElementsByClassName("font-bold uppercase")
-      .item(0).innerHTML;
+    let status = (
+      document.getElementsByClassName("font-bold uppercase").item(0) as Element
+    ).innerHTML;
 
-    let readDirection = querySelectorAllRegex(document, "name", /arrow-\w*/g);
+    let readDirection: Element[] | string = querySelectorAllRegex(
+      document,
+      "name",
+      /arrow-\w*/g
+    );
     if (readDirection.length == 0) {
       readDirection = "";
     } else {
@@ -182,5 +219,3 @@ async function getByID(id, options = {}) {
     return { url: `${baseURL}/title/${id}`, valid: false };
   }
 }
-
-module.exports = getByID;

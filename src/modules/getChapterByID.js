@@ -1,11 +1,13 @@
 const { fetchHTML } = require("./utils");
 
 /**
- * Get all images from a chapter by. get chapter id from getByID
- * @param {string} chapterID
- * @param {string} baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
+ * Get all images from a chapter by id.
+ * @param {string} chapterID The id of the chapter. get chapter id from getByID
+ * @param {Object} options Options for getting the information
+ * @param {import("./utils").sources} options.baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
  */
-async function getChapterByID(chapterID, baseURL = "https://bato.to") {
+async function getChapterByID(chapterID, options = {}) {
+  const baseURL = options.baseURL || "https://bato.to";
   try {
     const document = await fetchHTML(`${baseURL}/title/${chapterID}`);
     if (document == null) {

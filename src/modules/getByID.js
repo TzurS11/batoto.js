@@ -3,9 +3,12 @@ const { fetchHTML, querySelectorAllRegex, isMature } = require("./utils");
 /**
  * Get more information about a manga based on its id. title, author, poster, genres, chapters, description, read direction, status, score. the id can be found with searchByKeyword.
  * @param {string} id the id of the manga.
- * @param {string} baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
+ * @param {Object} options Options for getting the information
+ * @param {import("./utils").sources} options.baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
  */
-async function getByID(id, baseURL = "https://bato.to") {
+// * @param {string} baseURL
+async function getByID(id, options = {}) {
+  const baseURL = options.baseURL || "https://bato.to";
   try {
     const document = await fetchHTML(`${baseURL}/title/${id}`);
     if (document == null) {

@@ -59,7 +59,7 @@ app.get("/getRandom", async function (req, res) {
 app.get("/searchByKeyword/:keyword", async function (req, res) {
   const keyword = req.params.keyword;
 
-  const search = await searchByKeyword(keyword, 1);
+  const search = await searchByKeyword(keyword, { page: 1 });
   if (!search.valid) {
     return res.status(404).send({ error: "No results found." });
   }
@@ -85,7 +85,7 @@ app.get("/getByID/:id", async function (req, res) {
 // http://localhost:8080/getByID/82182-kimetsu-no-yaiba-official
 
 app.get("/getChapterByID/:id", async function (req, res) {
-  const id = req.params.id.replace(/%2F/g,"/");
+  const id = req.params.id.replace(/%2F/g, "/");
   // turning %2F back to / because the function expects the id with /
 
   const chapter = await getChapterByID(id);

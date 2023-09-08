@@ -3,10 +3,12 @@ const { isMature } = require("./utils");
 
 /**
  * Get random mangas
- * @param {string} baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
+ * @param {Object} options Options for getting the information.
+ * @param {import("./utils").sources} options.baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
  * @returns
  */
-async function getRandom(baseURL = "https://bato.to") {
+async function getRandom(options = {}) {
+  const baseURL = options.baseURL || "https://bato.to";
   try {
     const response = await axios.post(
       `${baseURL}/apo/`,

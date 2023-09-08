@@ -1,15 +1,23 @@
-const { fetchHTML, querySelectorAllRegex, isMature } = require("./utils");
+const {
+  fetchHTML,
+  querySelectorAllRegex,
+  isMature,
+} = require("./utils");
 
 /**
  * Get list of mangas from a keyword. Example: Kimetsu no Yaiba, Demon Slayer
  * @param {string} keyword The text value.
  * @param {number} page If there are too many results to fit in one page you can access another page. Get amount of pages by calling this command with page param set to 1 or dont type anything as the param
- * @param {string} baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
+ * @param {Object} options Options for getting the information.
+ * @param {number} options.page If there are multiple pages for the same keyword then you can go to the next page by passing the number here
+ * @param {import("./utils").sources} options.baseURL the base url of the website in case bato.to is not working anymore. get list of compatible websites from here: https://rentry.co/batoto
  */
-async function searchByKeyword(keyword, page = 1, baseURL = "https://bato.to") {
+async function searchByKeyword(keyword, options = {}) {
+  const baseURL = options.baseURL || "https://bato.to";
+  const page = options.page || 1;
   try {
     let document = await fetchHTML(
-      `${baseURL}/v3x-search?word=${keyword}&orig=&lang=ja,ko,zh,en&sort=field_follow&page=${page}`
+      `${baseURL}/v3x-search?word=${keyword}&lang=ja,ko,zh,en&sort=field_follow&page=${page}`
     );
     if (document == null) {
       return { valid: false };

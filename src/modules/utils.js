@@ -19,9 +19,6 @@ async function fetchHTML(url) {
 }
 /**
  * regex search an attribute inside a document.
- * @param {Document} document
- * @param {string} attribute
- * @param {RegExp} regex
  * @returns
  */
 function querySelectorAllRegex(document, attribute, regex) {
@@ -33,7 +30,7 @@ function querySelectorAllRegex(document, attribute, regex) {
   // Filter elements based on the regular expression pattern
   const matchingElements = Array.from(elementsWithAttribute).filter(
     (element) => {
-      const attributeValue = element.getAttribute(attribute);
+      const attributeValue = element.getAttribute(attribute) || "";
       return regexPattern.test(attributeValue);
     }
   );
@@ -45,12 +42,50 @@ function querySelectorAllRegex(document, attribute, regex) {
  * @param {String[]} genres
  */
 function isMature(genres) {
-  let NSFWgenres = ["mature", "smut"];
+  let NSFWgenres = [
+    "gore",
+    "bloody",
+    "violence",
+    "ecchi",
+    "adult",
+    "mature",
+    "smut",
+    "hentai",
+  ];
   for (let i = 0; i < genres.length; i++) {
     let genre = genres[i].toLowerCase();
     if (NSFWgenres.includes(genre)) return true;
   }
   return false;
 }
+
+/**
+ * @typedef {"https://bato.to" |
+ *           "https://wto.to" |
+ *           "https://mto.to" |
+ *           "https://dto.to" |
+ *           "https://hto.to" |
+ *           "https://batotoo.com" |
+ *           "https://battwo.com" |
+ *           "https://batotwo.com" |
+ *           "https://comiko.net" |
+ *           "https://mangatoto.com" |
+ *           "https://mangatoto.net" |
+ *           "https://mangatoto.org" |
+ *           "https://comiko.org" |
+ *           "https://batocomic.com" |
+ *           "https://batocomic.net" |
+ *           "https://batocomic.org" |
+ *           "https://readtoto.com" |
+ *           "https://readtoto.net" |
+ *           "https://readtoto.org" |
+ *           "https://xbato.com" |
+ *           "https://xbato.net" |
+ *           "https://xbato.org" |
+ *           "https://zbato.com" |
+ *           "https://zbato.net" |
+ *           "https://zbato.org"} sources
+ * 
+ */
 
 module.exports = { fetchHTML, querySelectorAllRegex, isMature };

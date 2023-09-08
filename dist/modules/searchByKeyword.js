@@ -16,15 +16,11 @@ async function searchByKeyword(keyword, options = { baseURL: "https://bato.to", 
         if (document == null) {
             return { valid: false };
         }
-        document.getElementsByTagName("img");
         const matchingElements = (0, utils_1.querySelectorAllRegex)(document.querySelector('[data-hk="0-0-2"]'), "data-hk", /0-0-3-\d*-0/);
-        const pages = document.querySelector('[data-hk="0-0-4-0-0"]');
         for (let i = 0; i < matchingElements.length; i++) {
             let poster = (0, utils_1.querySelectorAllRegex)(matchingElements[i], "data-hk", /0-0-3-\d*-1-1-0/)[0].src;
             const id = (0, utils_1.querySelectorAllRegex)(matchingElements[i], "data-hk", /0-0-3-\d*-1-1-0/)[0].parentElement.href.split("/")[2];
-            const titleOriginal = (0, utils_1.querySelectorAllRegex)(matchingElements[i], "data-hk", /0-0-3-\d*-2-2-0/)[0]
-                .innerHTML.replace(/<span class="highlight-text">/g, "")
-                .replace(/<\/span>/g, "");
+            const titleOriginal = (0, utils_1.querySelectorAllRegex)(matchingElements[i], "data-hk", /0-0-3-\d*-1-1-0/)[0].title;
             const titleSynonyms = (0, utils_1.querySelectorAllRegex)(matchingElements[i], "data-hk", /0-0-3-\d*-3-1-\d*-0/);
             let currentSyns = [];
             for (let i = 0; i < titleSynonyms.length; i++) {
@@ -65,6 +61,9 @@ async function searchByKeyword(keyword, options = { baseURL: "https://bato.to", 
                 mature: mature,
             });
         }
+        const pages = document.querySelector('[data-hk="0-0-4-0-0"]');
+        //0-0-4-0-1-3-2-0
+        //0-0-4-0-1-5-2-0
         let numOfPages = 0;
         if (pages != null) {
             let pageAs = (0, utils_1.querySelectorAllRegex)(pages, "data-hk", /0-0-4-0-1-\d*-2-0/);
@@ -86,5 +85,3 @@ async function searchByKeyword(keyword, options = { baseURL: "https://bato.to", 
     }
 }
 exports.searchByKeyword = searchByKeyword;
-searchByKeyword("jinx");
-// module.exports = searchByKeyword;

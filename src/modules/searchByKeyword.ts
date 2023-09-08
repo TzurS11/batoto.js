@@ -32,13 +32,12 @@ export async function searchByKeyword(
     if (document == null) {
       return { valid: false };
     }
-    document.getElementsByTagName("img");
     const matchingElements = querySelectorAllRegex(
       document.querySelector('[data-hk="0-0-2"]') as Element,
       "data-hk",
       /0-0-3-\d*-0/
     );
-    const pages = document.querySelector('[data-hk="0-0-4-0-0"]');
+
     for (let i = 0; i < matchingElements.length; i++) {
       let poster = (
         querySelectorAllRegex(
@@ -56,14 +55,13 @@ export async function searchByKeyword(
         )[0].parentElement as HTMLAnchorElement
       ).href.split("/")[2];
 
-      const titleOriginal = querySelectorAllRegex(
-        matchingElements[i],
-        "data-hk",
-        /0-0-3-\d*-2-2-0/
-      )[0]
-        .innerHTML.replace(/<span class="highlight-text">/g, "")
-        .replace(/<\/span>/g, "");
-
+      const titleOriginal = (
+        querySelectorAllRegex(
+          matchingElements[i],
+          "data-hk",
+          /0-0-3-\d*-1-1-0/
+        )[0] as HTMLImageElement
+      ).title
       const titleSynonyms = querySelectorAllRegex(
         matchingElements[i],
         "data-hk",
@@ -125,6 +123,11 @@ export async function searchByKeyword(
         mature: mature,
       });
     }
+
+    const pages = document.querySelector('[data-hk="0-0-4-0-0"]');
+
+    //0-0-4-0-1-3-2-0
+    //0-0-4-0-1-5-2-0
     let numOfPages = 0;
     if (pages != null) {
       let pageAs = querySelectorAllRegex(pages, "data-hk", /0-0-4-0-1-\d*-2-0/);
@@ -147,6 +150,3 @@ export async function searchByKeyword(
     };
   }
 }
-searchByKeyword("jinx");
-
-// module.exports = searchByKeyword;

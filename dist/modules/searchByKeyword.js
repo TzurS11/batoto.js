@@ -14,7 +14,11 @@ async function searchByKeyword(keyword, options = { baseURL: "https://bato.to", 
         const list = [];
         let document = await (0, utils_1.fetchHTML)(`${baseURL}/v3x-search?word=${keyword}&lang=ja,ko,zh,en&sort=field_follow&page=${page}`);
         if (document == null) {
-            return { valid: false };
+            return {
+                valid: false,
+                results: [],
+                pages: 0,
+            };
         }
         const matchingElements = (0, utils_1.querySelectorAllRegex)(document.querySelector('[data-hk="0-0-2"]'), "data-hk", /0-0-3-\d*-0/);
         for (let i = 0; i < matchingElements.length; i++) {
@@ -80,8 +84,9 @@ async function searchByKeyword(keyword, options = { baseURL: "https://bato.to", 
     catch (e) {
         console.error(e);
         return {
-            url: `${baseURL}/v3x-search?word=${keyword}&orig=&lang=ja,ko,zh,en&sort=field_follow&page=${page}`,
             valid: false,
+            results: [],
+            pages: 0,
         };
     }
 }

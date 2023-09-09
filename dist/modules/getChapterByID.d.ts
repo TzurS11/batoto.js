@@ -10,6 +10,6 @@ type options = {
 export declare function getChapterByID(chapterID: string, options?: options): Promise<{
     url: string;
     valid: boolean;
-    pages: any[];
+    pages: string[];
 }>;
 export {};

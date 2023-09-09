@@ -20,12 +20,12 @@ export async function getChapterByID(
       return {
         url: `${baseURL}/title/${chapterID}`,
         valid: false,
-        pages: [].map((element) => String(element)),
+        pages: [] as string[],
       };
     }
     const astroisland = document.getElementsByTagName("astro-island");
 
-    const pages = [];
+    const pages: string[] = [];
     for (let i = 0; i < astroisland.length; i++) {
       const propsJSON = JSON.parse(
         (astroisland.item(i) as Element).getAttribute("props") as string
@@ -47,7 +47,7 @@ export async function getChapterByID(
     return {
       url: `${baseURL}/title/${chapterID}`,
       valid: false,
-      pages: [].map((element) => String(element)),
+      pages: [] as string[],
     };
   }
 }

@@ -15,7 +15,7 @@ async function getChapterByID(chapterID, options = { baseURL: "https://bato.to" 
             return {
                 url: `${baseURL}/title/${chapterID}`,
                 valid: false,
-                pages: [].map((element) => String(element)),
+                pages: [],
             };
         }
         const astroisland = document.getElementsByTagName("astro-island");
@@ -40,7 +40,7 @@ async function getChapterByID(chapterID, options = { baseURL: "https://bato.to" 
         return {
             url: `${baseURL}/title/${chapterID}`,
             valid: false,
-            pages: [].map((element) => String(element)),
+            pages: [],
         };
     }
 }

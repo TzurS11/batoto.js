@@ -10,9 +10,19 @@ type options = {
  */
 export declare function searchByKeyword(keyword: string, options?: options): Promise<{
     valid: boolean;
+    results: {
+        id: string;
+        title: {
+            original: string;
+            synonyms: string[];
+        };
+        authors: string[];
+        poster: string;
+        genres: string[];
+        mature: boolean;
+    }[];
+    pages: number;
     url?: undefined;
-    results?: undefined;
-    pages?: undefined;
 } | {
     url: string;
     valid: boolean;
@@ -28,10 +38,5 @@ export declare function searchByKeyword(keyword: string, options?: options): Pro
         mature: boolean;
     }[];
     pages: number;
-} | {
-    url: string;
-    valid: boolean;
-    results?: undefined;
-    pages?: undefined;
 }>;
 export {};

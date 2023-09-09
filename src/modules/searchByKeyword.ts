@@ -30,7 +30,18 @@ export async function searchByKeyword(
       `${baseURL}/v3x-search?word=${keyword}&lang=ja,ko,zh,en&sort=field_follow&page=${page}`
     );
     if (document == null) {
-      return { valid: false };
+      return {
+        valid: false,
+        results: [] as {
+          id: string;
+          title: { original: string; synonyms: string[] };
+          authors: string[];
+          poster: string;
+          genres: string[];
+          mature: boolean;
+        }[],
+        pages: 0,
+      };
     }
     const matchingElements = querySelectorAllRegex(
       document.querySelector('[data-hk="0-0-2"]') as Element,
@@ -134,8 +145,16 @@ export async function searchByKeyword(
   } catch (e) {
     console.error(e);
     return {
-      url: `${baseURL}/v3x-search?word=${keyword}&orig=&lang=ja,ko,zh,en&sort=field_follow&page=${page}`,
       valid: false,
+      results: [] as {
+        id: string;
+        title: { original: string; synonyms: string[] };
+        authors: string[];
+        poster: string;
+        genres: string[];
+        mature: boolean;
+      }[],
+      pages: 0,
     };
   }
 }

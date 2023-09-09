@@ -1,7 +1,7 @@
 import { sources } from "./utils";
 type options = {
-    page: number;
-    baseURL: sources;
+    page?: number;
+    baseURL?: sources;
 };
 /**
  * Get list of mangas from a keyword. Example: Kimetsu no Yaiba, Demon Slayer

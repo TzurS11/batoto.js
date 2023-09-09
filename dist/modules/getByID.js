@@ -2,130 +2,150 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getByID = void 0;
 const utils_1 = require("./utils");
+function arrayFixer(arr) {
+    let fixedArray = [];
+    for (let i = 0; i < arr.length; i++) {
+        fixedArray.push(arr[i][1] || "");
+    }
+    return fixedArray;
+}
+function capitalizeEveryWord(input) {
+    // Split the input string into an array of words
+    const words = input.split(" ");
+    // Capitalize the first letter of each word and join them back together
+    const capitalizedWords = words.map((word) => {
+        if (word.length > 0) {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }
+        else {
+            return "";
+        }
+    });
+    // Join the capitalized words into a single string
+    return capitalizedWords.join(" ");
+}
 /**
  * Get more information about a manga based on its id. title, author, poster, genres, chapters, description, read direction, status, score. the id can be found with searchByKeyword.
  * @param id the id of the manga.
- * @param  options Options for getting the information
+ * @param options Options for getting the information
  */
 // * @param {string} baseURL
-async function getByID(id, options = { baseURL: "https://bato.to" }) {
+async function getByID(id, options = { baseURL: "https://bato.to", noChapters: false }) {
     const baseURL = options.baseURL || "https://bato.to";
+    const noChapters = options.noChapters || false;
     try {
         const document = await (0, utils_1.fetchHTML)(`${baseURL}/title/${id}`);
         if (document == null) {
-            return { valid: false, url: `${baseURL}/title/${id}` };
+            return {
+                url: `${baseURL}/title/${id}`,
+                valid: false,
+                id: "",
+                title: "",
+                languages: "",
+                description: "",
+                authors: [],
+                artists: [],
+                poster: "",
+                genres: "",
+                score: 0,
+                status: "",
+                readDirection: "",
+                mature: false,
+                chapters: [],
+            };
         }
-        let titleOriginal = document.querySelector("#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > h3 > a");
-        if (titleOriginal == null) {
-            return { valid: false, url: `${baseURL}/title/${id}` };
+        let data = JSON.parse(document.querySelector('[prefix="r20"]').getAttribute("props")).data[1];
+        const mangaID = data.urlPath[1].split("/")[2];
+        const title = {
+            original: data.name[1] || "",
+            synonyms: arrayFixer(JSON.parse(data.altNames[1])),
+        };
+        const authors = arrayFixer(JSON.parse(data.authors[1]));
+        const artists = arrayFixer(JSON.parse(data.artists[1]));
+        let genres = arrayFixer(JSON.parse(data.genres[1]));
+        genres = genres.map((genre) => capitalizeEveryWord(genre.replace(/_/g, " ")));
+        const status = data.originalStatus[1];
+        let readDirection = data.readDirection[1];
+        switch (readDirection) {
+            case "ltr":
+                readDirection = "Left to Right";
+                break;
+            case "ltr":
+                readDirection = "Right to Left";
+                break;
+            case "ttb":
+                readDirection = "Top to Bottom";
+                break;
+            default:
+                readDirection = "";
+                break;
         }
-        titleOriginal = document.querySelector("#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > h3 > a").innerHTML;
-        const poster = document.querySelector("#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.w-24.md\\:w-52.flex-none.justify-start.items-start > img").src;
-        let synonymsQuery = document.querySelector("#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > div.mt-1.text-xs.md\\:text-base.opacity-80");
-        // .getElementsByTagName("span");
-        let synonymsArray = [];
-        if (synonymsQuery != null) {
-            let synonyms = synonymsQuery.getElementsByTagName("span");
-            for (let i = 0; i < synonyms.length; i++) {
-                let currentSpan = synonyms.item(i);
-                if (currentSpan.innerHTML != " / ")
-                    synonymsArray.push(currentSpan.innerHTML);
-            }
-        }
-        let authorsQuerySelector = document.querySelector("#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.flex > div.grow.pl-3.space-y-2.md\\:hidden > div.mt-2.text-sm.md\\:text-base.opacity-80");
-        let authorsArray = [];
-        if (authorsQuerySelector != null) {
-            let authors = authorsQuerySelector.getElementsByTagName("a");
-            for (let i = 0; i < authors.length; i++) {
-                let currentA = authors.item(i);
-                authorsArray.push(currentA.innerHTML.replace("<!-- -->", ""));
-            }
-        }
-        let genres = document.querySelector("#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.mt-3.md\\:mt-0.md\\:pl-3.grow.grid.gap-3.grid-cols-1.lg\\:grid-cols-3 > div:nth-child(2) > div.flex.items-center.flex-wrap").getElementsByTagName("span");
-        let genresArray = [];
-        for (let i = 0; i < genres.length; i++) {
-            let currentSpan = genres.item(i);
-            if (currentSpan.innerHTML.includes('<span class="">')) {
-                genresArray.push(currentSpan.querySelector('[class=""]').innerHTML);
-            }
-            if (currentSpan.innerHTML.includes('<span class="font-bold">')) {
-                genresArray.push(currentSpan.querySelector('[class="font-bold"]').innerHTML);
-            }
-            if (currentSpan.innerHTML.includes('<span class="font-bold border-b border-b-primary">')) {
-                genresArray.push(currentSpan.querySelector('[class="font-bold border-b border-b-primary"]').innerHTML);
-            }
-            if (currentSpan.innerHTML.includes('<span class="font-bold border-b border-b-warning">')) {
-                genresArray.push(currentSpan.querySelector('[class="font-bold border-b border-b-warning"]').innerHTML);
-            }
-        }
+        let description = data.summary[1].text[1];
+        const poster = data.urlCoverOri[1];
+        const score = data.stat_score_avg[1];
         let chaptersArray = [];
-        let chaptersDivs = (0, utils_1.querySelectorAllRegex)(document.querySelector("#app-wrapper > main > div:nth-child(3) > astro-island > div > div:nth-child(2) > div.scrollable-panel.border-base-300\\/50.border.border-r-2.max-h-\\[380px\\].lg\\:max-h-\\[500px\\] > div"), "data-hk", /0-0-\d*-0/);
-        for (let i = 0; i < chaptersDivs.length; i++) {
-            let currentChapter = chaptersDivs[i];
-            // currentChapter.querySelector(
-            //   '[class="link-hover link-primary visited:text-accent"]'
-            // );
-            let chapter = currentChapter
-                .getElementsByClassName("link-hover link-primary visited:text-accent")
-                .item(0);
-            if (chapter != null) {
-                chaptersArray.push({
-                    name: chapter.innerHTML,
-                    id: chapter.href.replace("/title/", ""),
-                });
+        if (noChapters == false) {
+            let chaptersDivs = (0, utils_1.querySelectorAllRegex)(document.querySelector("#app-wrapper > main > div:nth-child(3) > astro-island > div > div:nth-child(2) > div.scrollable-panel.border-base-300\\/50.border.border-r-2.max-h-\\[380px\\].lg\\:max-h-\\[500px\\] > div"), "data-hk", /0-0-\d*-0/);
+            for (let i = 0; i < chaptersDivs.length; i++) {
+                let currentChapter = chaptersDivs[i];
+                let chapter = currentChapter
+                    .getElementsByClassName("link-hover link-primary visited:text-accent")
+                    .item(0);
+                if (chapter != null) {
+                    const chapterTime = currentChapter
+                        .getElementsByTagName("time")
+                        .item(0)
+                        .getAttribute("time");
+                    const timestamp = new Date(chapterTime).getTime();
+                    chaptersArray.push({
+                        name: chapter.innerHTML,
+                        id: chapter.href.replace("/title/", ""),
+                        timestamp: timestamp,
+                    });
+                }
             }
         }
-        let description = document.querySelector("#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.mt-3.md\\:mt-0.md\\:pl-3.grow.grid.gap-3.grid-cols-1.lg\\:grid-cols-3 > div.lg\\:col-span-3 > astro-island > div > div.max-h-28.overflow-y-hidden > astro-slot > div > astro-island:nth-child(1) > div > div > div > div > p");
-        if (description != null) {
-            description = description.innerHTML;
-        }
-        else {
-            description = "";
-        }
-        let score = document.querySelector("#app-wrapper > main > div.flex.flex-col.md\\:flex-row > div.mt-3.md\\:mt-0.md\\:pl-3.grow.grid.gap-3.grid-cols-1.lg\\:grid-cols-3 > div.md\\:max-lg\\:grid.md\\:max-lg\\:grid-cols-2.md\\:max-lg\\:gap-3 > div:nth-child(1) > div > div.flex.flex-col.justify-start.items-center > div.leading-\\[2\\.0rem\\].md\\:leading-\\[2\\.5rem\\].border-b.border-base-200\\/60.mb-1 > span").innerHTML
-            .replace(/<!-- -->/g, "")
-            .replace("&lt;", "<");
-        let status = document.getElementsByClassName("font-bold uppercase").item(0).innerHTML;
-        let readDirection = (0, utils_1.querySelectorAllRegex)(document, "name", /arrow-\w*/g);
-        if (readDirection.length == 0) {
-            readDirection = "";
-        }
-        else {
-            switch (readDirection[0].getAttribute("name")) {
-                case "arrow-right":
-                    readDirection = "Left to Right";
-                    break;
-                case "arrow-left":
-                    readDirection = "Right to Left";
-                    break;
-                case "arrow-down":
-                    readDirection = "Top to Bottom";
-                    break;
-                default:
-                    readDirection = "";
-            }
-        }
-        let mature = false;
-        if ((0, utils_1.isMature)(genresArray))
-            mature = true;
+        const languages = {
+            original: data.origLang[1] || "",
+            translated: data.tranLang[1] || "",
+        };
         return {
-            url: `${baseURL}/title/${id}`,
             valid: true,
-            title: { original: titleOriginal, synonyms: synonymsArray },
-            poster: poster,
-            authors: authorsArray,
-            genres: genresArray,
+            url: `${baseURL}/title/${id}`,
+            id: mangaID || "",
+            title: title,
+            languages: languages,
+            description: description || "",
+            authors: authors,
+            artists: artists,
+            poster: poster || "",
+            genres: genres,
+            score: score || 0,
+            status: status || "",
+            readDirection: readDirection || "",
+            mature: (0, utils_1.isMature)(genres),
             chapters: chaptersArray,
-            description: description,
-            readDirection: readDirection,
-            status: status,
-            score: score,
-            mature: mature,
         };
     }
     catch (e) {
         console.error(e);
-        return { url: `${baseURL}/title/${id}`, valid: false };
+        return {
+            url: `${baseURL}/title/${id}`,
+            valid: false,
+            id: "",
+            title: "",
+            languages: "",
+            description: "",
+            authors: [],
+            artists: [],
+            poster: "",
+            genres: "",
+            score: 0,
+            status: "",
+            readDirection: "",
+            mature: false,
+            chapters: [],
+        };
     }
 }
 exports.getByID = getByID;

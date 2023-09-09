@@ -52,11 +52,11 @@ function isMature(genres) {
         "hentai",
     ];
     for (let i = 0; i < genres.length; i++) {
-        let genre = genres[i].toLowerCase();
+        let genre = genres[i].toLowerCase().replace(/ /g, "_");
         if (NSFWgenres.includes(genre))
             return true;
     }
     return false;
 }
 exports.isMature = isMature;
-// module.exports = { fetchHTML, querySelectorAllRegex, isMature };
+// lits of mirror links https://rentry.co/batoto/raw

@@ -21,7 +21,7 @@ export async function fetchHTML(url: string): Promise<Document | null> {
  * @returns
  */
 export function querySelectorAllRegex(
-  document: Document|Element,
+  document: Document | Element,
   attribute: string,
   regex: RegExp
 ): Element[] {
@@ -56,7 +56,7 @@ export function isMature(genres: string[]): boolean {
     "hentai",
   ];
   for (let i = 0; i < genres.length; i++) {
-    let genre = genres[i].toLowerCase();
+    let genre = genres[i].toLowerCase().replace(/ /g, "_");
     if (NSFWgenres.includes(genre)) return true;
   }
   return false;
@@ -89,4 +89,4 @@ export type sources =
   | "https://zbato.net"
   | "https://zbato.org";
 
-// module.exports = { fetchHTML, querySelectorAllRegex, isMature };
+// lits of mirror links https://rentry.co/batoto/raw

@@ -1,7 +1,7 @@
 import { sources, fetchHTML } from "./utils";
 
 type options = {
-  baseURL: sources;
+  baseURL?: sources;
 };
 
 /**

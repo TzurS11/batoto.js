@@ -1,8 +1,8 @@
 import { fetchHTML, querySelectorAllRegex, isMature, sources } from "./utils";
 
 type options = {
-  page: number;
-  baseURL: sources;
+  page?: number;
+  baseURL?: sources;
 };
 
 /**
@@ -39,29 +39,18 @@ export async function searchByKeyword(
     );
 
     for (let i = 0; i < matchingElements.length; i++) {
-      let poster = (
-        querySelectorAllRegex(
-          matchingElements[i],
-          "data-hk",
-          /0-0-3-\d*-1-1-0/
-        )[0] as HTMLImageElement
-      ).src;
+      const posterElement = querySelectorAllRegex(
+        matchingElements[i],
+        "data-hk",
+        /0-0-3-\d*-1-1-0/
+      )[0] as HTMLImageElement;
+      const poster = posterElement.src;
 
-      const id = (
-        querySelectorAllRegex(
-          matchingElements[i],
-          "data-hk",
-          /0-0-3-\d*-1-1-0/
-        )[0].parentElement as HTMLAnchorElement
-      ).href.split("/")[2];
+      const id = (posterElement.parentElement as HTMLAnchorElement).href.split(
+        "/"
+      )[2];
 
-      const titleOriginal = (
-        querySelectorAllRegex(
-          matchingElements[i],
-          "data-hk",
-          /0-0-3-\d*-1-1-0/
-        )[0] as HTMLImageElement
-      ).title
+      const titleOriginal = posterElement.title;
       const titleSynonyms = querySelectorAllRegex(
         matchingElements[i],
         "data-hk",

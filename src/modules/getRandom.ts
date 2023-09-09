@@ -2,7 +2,7 @@ import axios from "axios";
 import { isMature, sources } from "./utils";
 
 type options = {
-  baseURL: sources;
+  baseURL?: sources;
 };
 
 /**

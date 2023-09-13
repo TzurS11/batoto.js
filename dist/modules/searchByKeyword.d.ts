@@ -1,5 +1,6 @@
-import { sources, langOriginal, langTransalted, sortOrder, status } from "./types";
+import { sources, langOriginal, langTransalted, sortOrder, status, axiosProxy } from "./types";
 type options = {
+    proxy?: axiosProxy;
     page?: number;
     baseURL?: sources;
     originalLanguage?: langOriginal[];

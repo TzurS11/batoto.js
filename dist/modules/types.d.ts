@@ -1,3 +1,12 @@
+export type axiosProxy = {
+    auth?: {
+        password: string;
+        username: string;
+    };
+    host: string;
+    port: number;
+    protocol?: string;
+};
 export type sortOrder = "field_score" | "field_follow" | "field_review" | "field_comment" | "field_chapter" | "field_upload" | "field_public" | "field_name";
 export type status = "pending" | "ongoing" | "completed" | "hiatus" | "cancelled";
 export type sources = "https://bato.to" | "https://wto.to" | "https://mto.to" | "https://dto.to" | "https://hto.to" | "https://batotoo.com" | "https://battwo.com" | "https://batotwo.com" | "https://comiko.net" | "https://mangatoto.com" | "https://mangatoto.net" | "https://mangatoto.org" | "https://comiko.org" | "https://batocomic.com" | "https://batocomic.net" | "https://batocomic.org" | "https://readtoto.com" | "https://readtoto.net" | "https://readtoto.org" | "https://xbato.com" | "https://xbato.net" | "https://xbato.org" | "https://zbato.com" | "https://zbato.net" | "https://zbato.org";

@@ -1,10 +1,10 @@
-import { langOriginal, langTransalted } from "./types";
+import { axiosProxy, langOriginal, langTransalted } from "./types";
 /**
  * get the html of the url as a document.
  * @param url The website you want to fetch
  * @returns
  */
-export declare function fetchHTML(url: string): Promise<Document | null>;
+export declare function fetchHTML(url: string, proxy: axiosProxy): Promise<Document | null>;
 /**
  * regex search an attribute inside a document.
  * @returns

@@ -8,7 +8,15 @@ const utils_1 = require("./utils");
  * @param options Options for getting the information.
  * @returns
  */
-async function getRandom(options = { baseURL: "https://bato.to" }) {
+async function getRandom(options = {
+    baseURL: "https://bato.to",
+    proxy: {
+        auth: { password: undefined, username: undefined },
+        host: undefined,
+        port: undefined,
+        protocol: undefined,
+    },
+}) {
     const baseURL = options.baseURL || "https://bato.to";
     try {
         const response = await axios_1.default.post(`${baseURL}/apo/`, {
@@ -148,6 +156,9 @@ async function getRandom(options = { baseURL: "https://bato.to" }) {
                 },
             },
         }, {
+            proxy: options.proxy.host == undefined || options.proxy.port == undefined
+                ? undefined
+                : options.proxy,
             headers: {
                 "Content-Type": "application/json",
                 Referer: `${baseURL}/v3x-random`,

@@ -9,14 +9,16 @@ const url = require("url");
  * @param url The website you want to fetch
  * @returns
  */
-async function fetchHTML(url) {
+async function fetchHTML(url, proxy) {
     try {
-        const response = await axios_1.default.get(url);
+        const response = await axios_1.default.get(url, {
+            proxy: proxy.host == undefined || proxy.port == undefined ? undefined : proxy,
+        });
         const dom = new jsdom_1.JSDOM(response.data);
         const document = dom.window.document;
         return document;
     }
-    catch {
+    catch (error) {
         return null;
     }
 }

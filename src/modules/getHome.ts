@@ -1,9 +1,10 @@
 import { fetchHTML, querySelectorAllRegex, isMature } from "./utils";
 
-import { sources } from "./types";
+import { axiosProxy, sources } from "./types";
 
 type options = {
   baseURL?: sources;
+  proxy?: axiosProxy;
 };
 /**
  * get all the the content in the home page.
@@ -11,11 +12,19 @@ type options = {
  * @returns
  */
 export async function getHome(
-  options: options = { baseURL: "https://bato.to" }
+  options: options = {
+    baseURL: "https://bato.to",
+    proxy: {
+      auth: { password: undefined, username: undefined },
+      host: undefined,
+      port: undefined,
+      protocol: undefined,
+    },
+  }
 ) {
   const baseURL = options.baseURL || "https://bato.to";
   try {
-    let document = await fetchHTML(`${baseURL}/v3x`);
+    let document = await fetchHTML(`${baseURL}/v3x`, options.proxy);
     if (document == null) {
       return {
         url: `${baseURL}/v3x`,

@@ -1,6 +1,6 @@
 import { JSDOM } from "jsdom";
-import axios from "axios";
-import { langOriginal, langTransalted } from "./types";
+import axios, { AxiosResponse } from "axios";
+import { axiosProxy, langOriginal, langTransalted } from "./types";
 import * as url from "url";
 
 /**
@@ -8,13 +8,19 @@ import * as url from "url";
  * @param url The website you want to fetch
  * @returns
  */
-export async function fetchHTML(url: string): Promise<Document | null> {
+export async function fetchHTML(
+  url: string,
+  proxy: axiosProxy
+): Promise<Document | null> {
   try {
-    const response = await axios.get(url);
+    const response = await axios.get(url, {
+      proxy:
+        proxy.host == undefined || proxy.port == undefined ? undefined : proxy,
+    });
     const dom = new JSDOM(response.data);
     const document = dom.window.document;
     return document;
-  } catch {
+  } catch (error) {
     return null;
   }
 }

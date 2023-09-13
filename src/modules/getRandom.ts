@@ -1,9 +1,10 @@
 import axios from "axios";
 import { isMature } from "./utils";
-import { sources } from "./types";
+import { axiosProxy, sources } from "./types";
 
 type options = {
   baseURL?: sources;
+  proxy?: axiosProxy;
 };
 
 /**
@@ -12,7 +13,15 @@ type options = {
  * @returns
  */
 export async function getRandom(
-  options: options = { baseURL: "https://bato.to" }
+  options: options = {
+    baseURL: "https://bato.to",
+    proxy: {
+      auth: { password: undefined, username: undefined },
+      host: undefined,
+      port: undefined,
+      protocol: undefined,
+    },
+  }
 ) {
   const baseURL = options.baseURL || "https://bato.to";
   try {
@@ -156,6 +165,10 @@ export async function getRandom(
         },
       },
       {
+        proxy:
+          options.proxy.host == undefined || options.proxy.port == undefined
+            ? undefined
+            : options.proxy,
         headers: {
           "Content-Type": "application/json",
           Referer: `${baseURL}/v3x-random`,

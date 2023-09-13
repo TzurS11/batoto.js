@@ -7,10 +7,18 @@ const utils_1 = require("./utils");
  * @param options
  * @returns
  */
-async function getHome(options = { baseURL: "https://bato.to" }) {
+async function getHome(options = {
+    baseURL: "https://bato.to",
+    proxy: {
+        auth: { password: undefined, username: undefined },
+        host: undefined,
+        port: undefined,
+        protocol: undefined,
+    },
+}) {
     const baseURL = options.baseURL || "https://bato.to";
     try {
-        let document = await (0, utils_1.fetchHTML)(`${baseURL}/v3x`);
+        let document = await (0, utils_1.fetchHTML)(`${baseURL}/v3x`, options.proxy);
         if (document == null) {
             return {
                 url: `${baseURL}/v3x`,

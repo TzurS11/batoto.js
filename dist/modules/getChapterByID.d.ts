@@ -1,8 +1,9 @@
-import { sources } from "./types";
+import { axiosProxy, sources } from "./types";
 type options = {
     baseURL?: sources;
     unicode?: boolean;
     cache?: boolean;
+    proxy?: axiosProxy;
 };
 /**
  * Get all images from a chapter by id.

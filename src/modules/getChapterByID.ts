@@ -1,12 +1,13 @@
 import { convertSpecialCharsToUnicode, fetchHTML, isPageValid } from "./utils";
 
 import * as fs from "fs";
-import { sources } from "./types";
+import { axiosProxy, sources } from "./types";
 
 type options = {
   baseURL?: sources;
   unicode?: boolean;
   cache?: boolean;
+  proxy?: axiosProxy;
 };
 
 /**
@@ -20,6 +21,12 @@ export async function getChapterByID(
     baseURL: "https://bato.to",
     unicode: false,
     cache: false,
+    proxy: {
+      auth: { password: undefined, username: undefined },
+      host: undefined,
+      port: undefined,
+      protocol: undefined,
+    },
   }
 ) {
   const baseURL = options.baseURL || "https://bato.to";
@@ -47,7 +54,10 @@ export async function getChapterByID(
       }
     }
 
-    const document = await fetchHTML(`${baseURL}/title/${chapterID}`);
+    const document = await fetchHTML(
+      `${baseURL}/title/${chapterID}`,
+      options.proxy
+    );
     if (document == null) {
       return {
         url: `${baseURL}/title/${chapterID}`,

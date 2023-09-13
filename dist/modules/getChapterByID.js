@@ -12,6 +12,12 @@ async function getChapterByID(chapterID, options = {
     baseURL: "https://bato.to",
     unicode: false,
     cache: false,
+    proxy: {
+        auth: { password: undefined, username: undefined },
+        host: undefined,
+        port: undefined,
+        protocol: undefined,
+    },
 }) {
     const baseURL = options.baseURL || "https://bato.to";
     const unicode = options.unicode || false;
@@ -28,7 +34,7 @@ async function getChapterByID(chapterID, options = {
                 }
             }
         }
-        const document = await (0, utils_1.fetchHTML)(`${baseURL}/title/${chapterID}`);
+        const document = await (0, utils_1.fetchHTML)(`${baseURL}/title/${chapterID}`, options.proxy);
         if (document == null) {
             return {
                 url: `${baseURL}/title/${chapterID}`,

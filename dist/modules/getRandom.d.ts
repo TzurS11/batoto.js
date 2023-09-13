@@ -1,6 +1,7 @@
-import { sources } from "./types";
+import { axiosProxy, sources } from "./types";
 type options = {
     baseURL?: sources;
+    proxy?: axiosProxy;
 };
 /**
  * Get random mangas

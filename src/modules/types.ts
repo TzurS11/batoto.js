@@ -1,3 +1,10 @@
+export type axiosProxy = {
+  auth?: { password: string; username: string };
+  host: string;
+  port: number;
+  protocol?: string;
+};
+
 export type sortOrder =
   | "field_score"
   | "field_follow"

@@ -8,6 +8,12 @@ const utils_1 = require("./utils");
  * @param options Options for getting the information.
  */
 async function searchByKeyword(keyword, options = {
+    proxy: {
+        auth: { password: undefined, username: undefined },
+        host: undefined,
+        port: undefined,
+        protocol: undefined,
+    },
     baseURL: "https://bato.to",
     page: 1,
     originalLanguage: [],
@@ -26,7 +32,7 @@ async function searchByKeyword(keyword, options = {
     let uri = `${baseURL}/v3x-search?word=${keyword}&orig=${orig}&lang=${lang}&sort=${sort}&page=${page}&status=${workStatus}&upload=${uploadStatus}`;
     try {
         const list = [];
-        let document = await (0, utils_1.fetchHTML)(uri);
+        let document = await (0, utils_1.fetchHTML)(uri, options.proxy);
         if (document == null) {
             return {
                 url: uri,

@@ -30,11 +30,20 @@ function capitalizeEveryWord(input) {
  * @param options Options for getting the information
  */
 // * @param {string} baseURL
-async function getByID(id, options = { baseURL: "https://bato.to", noChapters: false }) {
+async function getByID(id, options = {
+    baseURL: "https://bato.to",
+    noChapters: false,
+    proxy: {
+        auth: { password: undefined, username: undefined },
+        host: undefined,
+        port: undefined,
+        protocol: undefined,
+    },
+}) {
     const baseURL = options.baseURL || "https://bato.to";
     const noChapters = options.noChapters || false;
     try {
-        const document = await (0, utils_1.fetchHTML)(`${baseURL}/title/${id}`);
+        const document = await (0, utils_1.fetchHTML)(`${baseURL}/title/${id}`, options.proxy);
         if (document == null) {
             return {
                 url: `${baseURL}/title/${id}`,

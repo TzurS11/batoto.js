@@ -1,7 +1,8 @@
-import { sources } from "./types";
+import { axiosProxy, sources } from "./types";
 type options = {
     baseURL?: sources;
     noChapters?: boolean;
+    proxy?: axiosProxy;
 };
 /**
  * Get more information about a manga based on its id. title, author, poster, genres, chapters, description, read direction, status, score. the id can be found with searchByKeyword.

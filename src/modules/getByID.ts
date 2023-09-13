@@ -1,9 +1,10 @@
 import { fetchHTML, querySelectorAllRegex, isMature } from "./utils";
-import { sources } from "./types";
+import { axiosProxy, sources } from "./types";
 
 type options = {
   baseURL?: sources;
   noChapters?: boolean;
+  proxy?: axiosProxy;
 };
 
 type batoArray = [number, string][];
@@ -40,12 +41,21 @@ function capitalizeEveryWord(input: string): string {
 // * @param {string} baseURL
 export async function getByID(
   id: string,
-  options: options = { baseURL: "https://bato.to", noChapters: false }
+  options: options = {
+    baseURL: "https://bato.to",
+    noChapters: false,
+    proxy: {
+      auth: { password: undefined, username: undefined },
+      host: undefined,
+      port: undefined,
+      protocol: undefined,
+    },
+  }
 ) {
   const baseURL = options.baseURL || "https://bato.to";
   const noChapters = options.noChapters || false;
   try {
-    const document = await fetchHTML(`${baseURL}/title/${id}`);
+    const document = await fetchHTML(`${baseURL}/title/${id}`, options.proxy);
     if (document == null) {
       return {
         url: `${baseURL}/title/${id}`,

@@ -11,9 +11,11 @@ import {
   langTransalted,
   sortOrder,
   status,
+  axiosProxy,
 } from "./types";
 
 type options = {
+  proxy?: axiosProxy;
   page?: number;
   baseURL?: sources;
   originalLanguage?: langOriginal[];
@@ -31,6 +33,12 @@ type options = {
 export async function searchByKeyword(
   keyword: string,
   options: options = {
+    proxy: {
+      auth: { password: undefined, username: undefined },
+      host: undefined,
+      port: undefined,
+      protocol: undefined,
+    },
     baseURL: "https://bato.to",
     page: 1,
     originalLanguage: [],
@@ -60,7 +68,7 @@ export async function searchByKeyword(
       mature: boolean;
     }[] = [];
 
-    let document = await fetchHTML(uri);
+    let document = await fetchHTML(uri, options.proxy);
     if (document == null) {
       return {
         url: uri,

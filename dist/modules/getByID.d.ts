@@ -1,4 +1,4 @@
-import { sources } from "./utils";
+import { sources } from "./types";
 type options = {
     baseURL?: sources;
     noChapters?: boolean;

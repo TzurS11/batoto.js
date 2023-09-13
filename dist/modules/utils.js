@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isMature = exports.querySelectorAllRegex = exports.fetchHTML = void 0;
+exports.convertSpecialCharsToUnicode = exports.isPageValid = exports.convertLangArrayToString = exports.isMature = exports.querySelectorAllRegex = exports.fetchHTML = void 0;
 const jsdom_1 = require("jsdom");
 const axios_1 = require("axios");
+const url = require("url");
 /**
  * get the html of the url as a document.
  * @param url The website you want to fetch
@@ -59,4 +60,43 @@ function isMature(genres) {
     return false;
 }
 exports.isMature = isMature;
-// lits of mirror links https://rentry.co/batoto/raw
+function convertLangArrayToString(langArr) {
+    let langString = "";
+    langArr = [...new Set(langArr)];
+    for (let i = 0; i < langArr.length; i++) {
+        if (i == langArr.length - 1) {
+            langString = langString + langArr[i];
+        }
+        else {
+            langString = langString + langArr[i] + ",";
+        }
+    }
+    return langString;
+}
+exports.convertLangArrayToString = convertLangArrayToString;
+/**
+ * check if an image is still valid. can be tested on one of the pages in a chapter to check if the image is expired
+ * @param url the address of the image.
+ */
+function isPageValid(urlString) {
+    const parsedUrl = url.parse(urlString, true);
+    const expParam = parsedUrl.query.exp;
+    if (!expParam) {
+        console.error("No 'exp' parameter found in the URL.");
+        return false;
+    }
+    const expirationTimestamp = parseInt(expParam, 10);
+    if (isNaN(expirationTimestamp)) {
+        console.error("'exp' parameter is not a valid timestamp.");
+        return false;
+    }
+    const currentTimestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
+    return currentTimestamp < expirationTimestamp;
+}
+exports.isPageValid = isPageValid;
+function convertSpecialCharsToUnicode(inputString) {
+    // Use encodeURIComponent to convert special characters to URL-encoded format
+    const encodedString = encodeURIComponent(inputString);
+    return encodedString;
+}
+exports.convertSpecialCharsToUnicode = convertSpecialCharsToUnicode;

@@ -1,7 +1,12 @@
-import { sources } from "./utils";
+import { sources, langOriginal, langTransalted, sortOrder, status } from "./types";
 type options = {
     page?: number;
     baseURL?: sources;
+    originalLanguage?: langOriginal[];
+    translatedLanguage?: langTransalted[];
+    sort?: sortOrder;
+    workStatus?: status;
+    uploadStatus?: status;
 };
 /**
  * Get list of mangas from a keyword. Example: Kimetsu no Yaiba, Demon Slayer
@@ -9,21 +14,6 @@ type options = {
  * @param options Options for getting the information.
  */
 export declare function searchByKeyword(keyword: string, options?: options): Promise<{
-    valid: boolean;
-    results: {
-        id: string;
-        title: {
-            original: string;
-            synonyms: string[];
-        };
-        authors: string[];
-        poster: string;
-        genres: string[];
-        mature: boolean;
-    }[];
-    pages: number;
-    url?: undefined;
-} | {
     url: string;
     valid: boolean;
     results: {

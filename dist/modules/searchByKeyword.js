@@ -7,14 +7,29 @@ const utils_1 = require("./utils");
  * @param keyword The text value.
  * @param options Options for getting the information.
  */
-async function searchByKeyword(keyword, options = { baseURL: "https://bato.to", page: 1 }) {
+async function searchByKeyword(keyword, options = {
+    baseURL: "https://bato.to",
+    page: 1,
+    originalLanguage: [],
+    translatedLanguage: ["ja", "ko", "zh", "en"],
+    sort: "field_score",
+    workStatus: "",
+    uploadStatus: "",
+}) {
     const baseURL = options.baseURL || "https://bato.to";
     const page = options.page || 1;
+    const orig = (0, utils_1.convertLangArrayToString)(options.originalLanguage || []);
+    const lang = (0, utils_1.convertLangArrayToString)(options.translatedLanguage || ["ja", "ko", "zh", "en"]);
+    const sort = options.sort || "field_score";
+    const workStatus = options.workStatus || "";
+    const uploadStatus = options.uploadStatus || "";
+    let uri = `${baseURL}/v3x-search?word=${keyword}&orig=${orig}&lang=${lang}&sort=${sort}&page=${page}&status=${workStatus}&upload=${uploadStatus}`;
     try {
         const list = [];
-        let document = await (0, utils_1.fetchHTML)(`${baseURL}/v3x-search?word=${keyword}&lang=ja,ko,zh,en&sort=field_follow&page=${page}`);
+        let document = await (0, utils_1.fetchHTML)(uri);
         if (document == null) {
             return {
+                url: uri,
                 valid: false,
                 results: [],
                 pages: 0,
@@ -75,7 +90,7 @@ async function searchByKeyword(keyword, options = { baseURL: "https://bato.to", 
             numOfPages = Number(pageAs[pageAs.length - 1].innerHTML);
         }
         return {
-            url: `${baseURL}/v3x-search?word=${keyword}&orig=&lang=ja,ko,zh,en&sort=field_follow&page=${page}`,
+            url: uri,
             valid: document.querySelector("#app-wrapper > main > div:nth-child(3) > button") == null,
             results: list,
             pages: numOfPages,
@@ -84,6 +99,7 @@ async function searchByKeyword(keyword, options = { baseURL: "https://bato.to", 
     catch (e) {
         console.error(e);
         return {
+            url: uri,
             valid: false,
             results: [],
             pages: 0,

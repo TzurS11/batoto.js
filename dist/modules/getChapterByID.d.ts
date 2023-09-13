@@ -1,6 +1,8 @@
-import { sources } from "./utils";
+import { sources } from "./types";
 type options = {
     baseURL?: sources;
+    unicode?: boolean;
+    cache?: boolean;
 };
 /**
  * Get all images from a chapter by id.

@@ -1,3 +1,4 @@
+import { langOriginal, langTransalted } from "./types";
 /**
  * get the html of the url as a document.
  * @param url The website you want to fetch
@@ -14,4 +15,10 @@ export declare function querySelectorAllRegex(document: Document | Element, attr
  * @param genres
  */
 export declare function isMature(genres: string[]): boolean;
-export type sources = "https://bato.to" | "https://wto.to" | "https://mto.to" | "https://dto.to" | "https://hto.to" | "https://batotoo.com" | "https://battwo.com" | "https://batotwo.com" | "https://comiko.net" | "https://mangatoto.com" | "https://mangatoto.net" | "https://mangatoto.org" | "https://comiko.org" | "https://batocomic.com" | "https://batocomic.net" | "https://batocomic.org" | "https://readtoto.com" | "https://readtoto.net" | "https://readtoto.org" | "https://xbato.com" | "https://xbato.net" | "https://xbato.org" | "https://zbato.com" | "https://zbato.net" | "https://zbato.org";
+export declare function convertLangArrayToString(langArr: langOriginal[] | langTransalted[]): string;
+/**
+ * check if an image is still valid. can be tested on one of the pages in a chapter to check if the image is expired
+ * @param url the address of the image.
+ */
+export declare function isPageValid(urlString: string): boolean;
+export declare function convertSpecialCharsToUnicode(inputString: string): string;

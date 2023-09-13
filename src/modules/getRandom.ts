@@ -1,5 +1,6 @@
 import axios from "axios";
-import { isMature, sources } from "./utils";
+import { isMature } from "./utils";
+import { sources } from "./types";
 
 type options = {
   baseURL?: sources;

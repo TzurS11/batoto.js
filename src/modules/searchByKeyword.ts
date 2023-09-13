@@ -1,8 +1,26 @@
-import { fetchHTML, querySelectorAllRegex, isMature, sources } from "./utils";
+import {
+  fetchHTML,
+  querySelectorAllRegex,
+  isMature,
+  convertLangArrayToString,
+} from "./utils";
+
+import {
+  sources,
+  langOriginal,
+  langTransalted,
+  sortOrder,
+  status,
+} from "./types";
 
 type options = {
   page?: number;
   baseURL?: sources;
+  originalLanguage?: langOriginal[];
+  translatedLanguage?: langTransalted[];
+  sort?: sortOrder;
+  workStatus?: status;
+  uploadStatus?: status;
 };
 
 /**
@@ -12,10 +30,26 @@ type options = {
  */
 export async function searchByKeyword(
   keyword: string,
-  options: options = { baseURL: "https://bato.to", page: 1 }
+  options: options = {
+    baseURL: "https://bato.to",
+    page: 1,
+    originalLanguage: [],
+    translatedLanguage: ["ja", "ko", "zh", "en"],
+    sort: "field_score",
+    workStatus: "" as status,
+    uploadStatus: "" as status,
+  }
 ) {
   const baseURL = options.baseURL || "https://bato.to";
   const page = options.page || 1;
+  const orig = convertLangArrayToString(options.originalLanguage || []);
+  const lang = convertLangArrayToString(
+    options.translatedLanguage || ["ja", "ko", "zh", "en"]
+  );
+  const sort = (options.sort as string) || "field_score";
+  const workStatus = (options.workStatus as string) || "";
+  const uploadStatus = (options.uploadStatus as string) || "";
+  let uri = `${baseURL}/v3x-search?word=${keyword}&orig=${orig}&lang=${lang}&sort=${sort}&page=${page}&status=${workStatus}&upload=${uploadStatus}`;
   try {
     const list: {
       id: string;
@@ -26,11 +60,10 @@ export async function searchByKeyword(
       mature: boolean;
     }[] = [];
 
-    let document = await fetchHTML(
-      `${baseURL}/v3x-search?word=${keyword}&lang=ja,ko,zh,en&sort=field_follow&page=${page}`
-    );
+    let document = await fetchHTML(uri);
     if (document == null) {
       return {
+        url: uri,
         valid: false,
         results: [] as {
           id: string;
@@ -134,7 +167,7 @@ export async function searchByKeyword(
       numOfPages = Number(pageAs[pageAs.length - 1].innerHTML);
     }
     return {
-      url: `${baseURL}/v3x-search?word=${keyword}&orig=&lang=ja,ko,zh,en&sort=field_follow&page=${page}`,
+      url: uri,
       valid:
         document.querySelector(
           "#app-wrapper > main > div:nth-child(3) > button"
@@ -145,6 +178,7 @@ export async function searchByKeyword(
   } catch (e) {
     console.error(e);
     return {
+      url: uri,
       valid: false,
       results: [] as {
         id: string;

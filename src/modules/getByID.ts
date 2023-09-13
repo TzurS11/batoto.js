@@ -1,4 +1,5 @@
-import { fetchHTML, querySelectorAllRegex, isMature, sources } from "./utils";
+import { fetchHTML, querySelectorAllRegex, isMature } from "./utils";
+import { sources } from "./types";
 
 type options = {
   baseURL?: sources;
@@ -75,7 +76,9 @@ export async function getByID(
     const authors = arrayFixer(JSON.parse(data.authors[1]));
     const artists = arrayFixer(JSON.parse(data.artists[1]));
     let genres = arrayFixer(JSON.parse(data.genres[1]));
-    genres = genres.map((genre) => capitalizeEveryWord(genre.replace(/_/g, " ")));
+    genres = genres.map((genre) =>
+      capitalizeEveryWord(genre.replace(/_/g, " "))
+    );
     const status = data.originalStatus[1];
     let readDirection = data.readDirection[1];
     switch (readDirection) {

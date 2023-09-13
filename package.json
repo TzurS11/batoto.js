@@ -1,15 +1,15 @@
 {
   "name": "batoto.js",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Scrape data from bato.to",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "node ./src/test/test.ts"
+    "test": "ts-node ./src/test/test.ts"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TzurS11/batoto.ts"
+    "url": "git+https://github.com/TzurS11/batoto.js"
   },
   "files": [
     "dist",

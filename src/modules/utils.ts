@@ -1,5 +1,7 @@
 import { JSDOM } from "jsdom";
 import axios from "axios";
+import { langOriginal, langTransalted } from "./types";
+import * as url from "url";
 
 /**
  * get the html of the url as a document.
@@ -62,31 +64,48 @@ export function isMature(genres: string[]): boolean {
   return false;
 }
 
-export type sources =
-  | "https://bato.to"
-  | "https://wto.to"
-  | "https://mto.to"
-  | "https://dto.to"
-  | "https://hto.to"
-  | "https://batotoo.com"
-  | "https://battwo.com"
-  | "https://batotwo.com"
-  | "https://comiko.net"
-  | "https://mangatoto.com"
-  | "https://mangatoto.net"
-  | "https://mangatoto.org"
-  | "https://comiko.org"
-  | "https://batocomic.com"
-  | "https://batocomic.net"
-  | "https://batocomic.org"
-  | "https://readtoto.com"
-  | "https://readtoto.net"
-  | "https://readtoto.org"
-  | "https://xbato.com"
-  | "https://xbato.net"
-  | "https://xbato.org"
-  | "https://zbato.com"
-  | "https://zbato.net"
-  | "https://zbato.org";
+export function convertLangArrayToString(
+  langArr: langOriginal[] | langTransalted[]
+) {
+  let langString = "";
+  langArr = [...new Set(langArr)];
+  for (let i = 0; i < langArr.length; i++) {
+    if (i == langArr.length - 1) {
+      langString = langString + langArr[i];
+    } else {
+      langString = langString + langArr[i] + ",";
+    }
+  }
+  return langString;
+}
 
-// lits of mirror links https://rentry.co/batoto/raw
+/**
+ * check if an image is still valid. can be tested on one of the pages in a chapter to check if the image is expired
+ * @param url the address of the image.
+ */
+export function isPageValid(urlString: string): boolean {
+  const parsedUrl = url.parse(urlString, true);
+  const expParam = parsedUrl.query.exp as string | undefined;
+
+  if (!expParam) {
+    console.error("No 'exp' parameter found in the URL.");
+    return false;
+  }
+
+  const expirationTimestamp = parseInt(expParam, 10);
+
+  if (isNaN(expirationTimestamp)) {
+    console.error("'exp' parameter is not a valid timestamp.");
+    return false;
+  }
+
+  const currentTimestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
+
+  return currentTimestamp < expirationTimestamp;
+}
+
+export function convertSpecialCharsToUnicode(inputString: string) {
+  // Use encodeURIComponent to convert special characters to URL-encoded format
+  const encodedString = encodeURIComponent(inputString);
+  return encodedString;
+}

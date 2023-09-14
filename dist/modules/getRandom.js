@@ -19,6 +19,17 @@ async function getRandom(options = {
 }) {
     const baseURL = options.baseURL || "https://bato.to";
     try {
+        let requestConfig = {
+            proxy: options.proxy.host == undefined || options.proxy.port == undefined
+                ? undefined
+                : options.proxy,
+            headers: {
+                "Content-Type": "application/json",
+                Referer: `${baseURL}/v3x-random`,
+            },
+        };
+        if (requestConfig.proxy == undefined)
+            delete requestConfig.proxy;
         const response = await axios_1.default.post(`${baseURL}/apo/`, {
             query: `
           query get_content_searchComic($select: SearchComic_Select) {
@@ -155,15 +166,7 @@ async function getRandom(options = {
                     ignoreGlobalBlocks: false,
                 },
             },
-        }, {
-            proxy: options.proxy.host == undefined || options.proxy.port == undefined
-                ? undefined
-                : options.proxy,
-            headers: {
-                "Content-Type": "application/json",
-                Referer: `${baseURL}/v3x-random`,
-            },
-        });
+        }, requestConfig);
         const randomComics = response.data.data.get_content_searchComic.items;
         const list = [];
         for (let i = 0; i < randomComics.length; i++) {

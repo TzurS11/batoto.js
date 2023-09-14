@@ -1,6 +1,6 @@
 {
   "name": "batoto.js",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Scrape data from bato.to",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -45,6 +45,7 @@
   "devDependencies": {
     "@types/jsdom": "^21.1.2",
     "ts-node": "^10.9.1",
+    "tsx": "^3.12.10",
     "typescript": "^5.2.2"
   }
 }

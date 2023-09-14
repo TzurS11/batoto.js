@@ -43,7 +43,7 @@ export async function getChapterByID(
 ) {
   const baseURL = options.baseURL || "https://bato.to";
   const unicode = options.unicode || false;
-  const cache = options.cache || false;
+  const cache = options.cache !== undefined ? options.cache : false;
 
   try {
     if (fs.existsSync("./cache/chapters.json")) {

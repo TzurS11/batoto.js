@@ -11,14 +11,21 @@ const url = require("url");
  */
 async function fetchHTML(url, proxy) {
     try {
-        const response = await axios_1.default.get(url, {
-            proxy: proxy.host == undefined || proxy.port == undefined ? undefined : proxy,
-        });
+        let response;
+        if (proxy == undefined ||
+            proxy.host == undefined ||
+            proxy.port == undefined) {
+            response = await axios_1.default.get(url);
+        }
+        else {
+            response = await axios_1.default.get(url, { proxy: proxy });
+        }
         const dom = new jsdom_1.JSDOM(response.data);
         const document = dom.window.document;
         return document;
     }
     catch (error) {
+        console.log(error.message);
         return null;
     }
 }

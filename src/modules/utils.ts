@@ -13,14 +13,22 @@ export async function fetchHTML(
   proxy: axiosProxy
 ): Promise<Document | null> {
   try {
-    const response = await axios.get(url, {
-      proxy:
-        proxy.host == undefined || proxy.port == undefined ? undefined : proxy,
-    });
+    let response: AxiosResponse<any, any>;
+    if (
+      proxy == undefined ||
+      proxy.host == undefined ||
+      proxy.port == undefined
+    ) {
+      response = await axios.get(url);
+    } else {
+      response = await axios.get(url, { proxy: proxy });
+    }
+
     const dom = new JSDOM(response.data);
     const document = dom.window.document;
     return document;
   } catch (error) {
+    console.log(error.message);
     return null;
   }
 }

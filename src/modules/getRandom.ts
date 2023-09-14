@@ -31,6 +31,17 @@ export async function getRandom(
 ) {
   const baseURL = options.baseURL || "https://bato.to";
   try {
+    let requestConfig = {
+      proxy:
+        options.proxy.host == undefined || options.proxy.port == undefined
+          ? undefined
+          : options.proxy,
+      headers: {
+        "Content-Type": "application/json",
+        Referer: `${baseURL}/v3x-random`,
+      },
+    };
+    if (requestConfig.proxy == undefined) delete requestConfig.proxy;
     const response = await axios.post(
       `${baseURL}/apo/`,
       {
@@ -170,18 +181,8 @@ export async function getRandom(
           },
         },
       },
-      {
-        proxy:
-          options.proxy.host == undefined || options.proxy.port == undefined
-            ? undefined
-            : options.proxy,
-        headers: {
-          "Content-Type": "application/json",
-          Referer: `${baseURL}/v3x-random`,
-        },
-      }
+      requestConfig
     );
-
     const randomComics = response.data.data.get_content_searchComic.items;
     const list: {
       id: string;

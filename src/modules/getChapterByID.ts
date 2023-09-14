@@ -4,9 +4,21 @@ import * as fs from "fs";
 import { axiosProxy, sources } from "./types";
 
 type options = {
+  /**
+   * incase https://bato.to goes down you can chagne the domain here. lits of mirror links https://rentry.co/batoto/raw
+   */
   baseURL?: sources;
+  /**
+   * converts all special chars so you can handle it as a url.
+   */
   unicode?: boolean;
+  /**
+   * cache the addresses of the images. this takes care of expiration of the images. images that are expired will be replaced with new data.
+   */
   cache?: boolean;
+  /**
+   * Set up a rotating proxy to prevent IP blocking when you have many requests to bato.to
+   */
   proxy?: axiosProxy;
 };
 
@@ -34,22 +46,20 @@ export async function getChapterByID(
   const cache = options.cache || false;
 
   try {
-    if (cache == true) {
-      if (fs.existsSync("./cache/chapters.json")) {
-        let cacheFile = JSON.parse(
-          fs.readFileSync("./cache/chapters.json", { encoding: "utf8" })
-        );
-        if (cacheFile[chapterID]) {
-          if (
-            cacheFile[chapterID].pages[0] != undefined &&
-            isPageValid(cacheFile[chapterID].pages[0])
-          ) {
-            return cacheFile[chapterID] as {
-              url: string;
-              valid: boolean;
-              pages: string[];
-            };
-          }
+    if (fs.existsSync("./cache/chapters.json")) {
+      let cacheFile = JSON.parse(
+        fs.readFileSync("./cache/chapters.json", { encoding: "utf8" })
+      );
+      if (cacheFile[chapterID]) {
+        if (
+          cacheFile[chapterID].pages[0] != undefined &&
+          isPageValid(cacheFile[chapterID].pages[0])
+        ) {
+          return cacheFile[chapterID] as {
+            url: string;
+            valid: boolean;
+            pages: string[];
+          };
         }
       }
     }
@@ -60,8 +70,17 @@ export async function getChapterByID(
     );
     if (document == null) {
       return {
+        /**
+         * the url used to get the chapter.
+         */
         url: `${baseURL}/title/${chapterID}`,
+        /**
+         * check if the scrape is valid and successful. always check if that is true before using pages
+         */
         valid: false,
+        /**
+         * List of image addresses. if valid is false the array will be empty
+         */
         pages: [] as string[],
       };
     }
@@ -106,15 +125,33 @@ export async function getChapterByID(
       }
     }
     return {
+      /**
+       * the url used to get the chapter.
+       */
       url: `${baseURL}/title/${chapterID}`,
+      /**
+       * check if the scrape is valid and successful. always check if that is true before using pages
+       */
       valid: pages.length == 0 ? false : true,
+      /**
+       * List of image addresses. if valid is false the array will be empty
+       */
       pages: pages,
     };
   } catch (error) {
     console.error(error);
     return {
+      /**
+       * the url used to get the chapter.
+       */
       url: `${baseURL}/title/${chapterID}`,
+      /**
+       * check if the scrape is valid and successful. always check if that is true before using pages
+       */
       valid: false,
+      /**
+       * List of image addresses. if valid is false the array will be empty
+       */
       pages: [] as string[],
     };
   }

@@ -23,22 +23,29 @@ async function getChapterByID(chapterID, options = {
     const unicode = options.unicode || false;
     const cache = options.cache || false;
     try {
-        if (cache == true) {
-            if (fs.existsSync("./cache/chapters.json")) {
-                let cacheFile = JSON.parse(fs.readFileSync("./cache/chapters.json", { encoding: "utf8" }));
-                if (cacheFile[chapterID]) {
-                    if (cacheFile[chapterID].pages[0] != undefined &&
-                        (0, utils_1.isPageValid)(cacheFile[chapterID].pages[0])) {
-                        return cacheFile[chapterID];
-                    }
+        if (fs.existsSync("./cache/chapters.json")) {
+            let cacheFile = JSON.parse(fs.readFileSync("./cache/chapters.json", { encoding: "utf8" }));
+            if (cacheFile[chapterID]) {
+                if (cacheFile[chapterID].pages[0] != undefined &&
+                    (0, utils_1.isPageValid)(cacheFile[chapterID].pages[0])) {
+                    return cacheFile[chapterID];
                 }
             }
         }
         const document = await (0, utils_1.fetchHTML)(`${baseURL}/title/${chapterID}`, options.proxy);
         if (document == null) {
             return {
+                /**
+                 * the url used to get the chapter.
+                 */
                 url: `${baseURL}/title/${chapterID}`,
+                /**
+                 * check if the scrape is valid and successful. always check if that is true before using pages
+                 */
                 valid: false,
+                /**
+                 * List of image addresses. if valid is false the array will be empty
+                 */
                 pages: [],
             };
         }
@@ -78,16 +85,34 @@ async function getChapterByID(chapterID, options = {
             }
         }
         return {
+            /**
+             * the url used to get the chapter.
+             */
             url: `${baseURL}/title/${chapterID}`,
+            /**
+             * check if the scrape is valid and successful. always check if that is true before using pages
+             */
             valid: pages.length == 0 ? false : true,
+            /**
+             * List of image addresses. if valid is false the array will be empty
+             */
             pages: pages,
         };
     }
     catch (error) {
         console.error(error);
         return {
+            /**
+             * the url used to get the chapter.
+             */
             url: `${baseURL}/title/${chapterID}`,
+            /**
+             * check if the scrape is valid and successful. always check if that is true before using pages
+             */
             valid: false,
+            /**
+             * List of image addresses. if valid is false the array will be empty
+             */
             pages: [],
         };
     }

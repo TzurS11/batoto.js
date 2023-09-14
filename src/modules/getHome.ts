@@ -3,7 +3,13 @@ import { fetchHTML, querySelectorAllRegex, isMature } from "./utils";
 import { axiosProxy, sources } from "./types";
 
 type options = {
+  /**
+   * incase https://bato.to goes down you can chagne the domain here. lits of mirror links https://rentry.co/batoto/raw
+   */
   baseURL?: sources;
+  /**
+   * Set up a rotating proxy to prevent IP blocking when you have many requests to bato.to
+   */
   proxy?: axiosProxy;
 };
 /**
@@ -27,8 +33,17 @@ export async function getHome(
     let document = await fetchHTML(`${baseURL}/v3x`, options.proxy);
     if (document == null) {
       return {
+        /**
+         * the url used to get the information.
+         */
         url: `${baseURL}/v3x`,
+        /**
+         * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases
+         */
         valid: false,
+        /**
+         * The mangas in the popular updates section. if valid is false eveything will be empty
+         */
         popularUpdates: [] as {
           poster: string;
           title: string;
@@ -38,6 +53,9 @@ export async function getHome(
             id: string;
           };
         }[],
+        /**
+         * The mangas in the latest releases section. if valid is false eveything will be empty
+         */
         latestReleases: [] as {
           poster: string;
           title: string;
@@ -133,28 +151,59 @@ export async function getHome(
           id: lastChapterAnchor.href.replace("/title/", "") || "",
         };
       }
+      const genres: string[] = [];
+      let chapterSpans = querySelectorAllRegex(
+        currentDiv,
+        "data-hk",
+        /0-0-\d*-4-2-\d*-3-0/
+      );
+      for (let j = 0; j < chapterSpans.length; j++) {
+        const currentSpan = chapterSpans[j];
+        genres.push(currentSpan.innerHTML);
+      }
 
       latestReleases.push({
         poster: currentDiv_img.src || "",
         title: currentDiv_img.alt || "",
         id: parent_currentDiv_img.href.replace("/title/", "") || "",
-        mature: true,
-        genres: [],
+        mature: isMature(genres),
+        genres: genres,
         lastChapter: lastChapter,
       });
     }
 
     return {
+      /**
+       * the url used to get the information.
+       */
       url: `${baseURL}/v3x`,
+      /**
+       * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases
+       */
       valid: true,
+      /**
+       * The mangas in the popular updates section. if valid is false eveything will be empty
+       */
       popularUpdates: popularUpdates,
+      /**
+       * The mangas in the latest releases section. if valid is false eveything will be empty
+       */
       latestReleases: latestReleases,
     };
   } catch (error: any) {
     console.error(error);
     return {
+      /**
+       * the url used to get the information.
+       */
       url: `${baseURL}/v3x`,
+      /**
+       * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases
+       */
       valid: false,
+      /**
+       * The mangas in the popular updates section. if valid is false eveything will be empty
+       */
       popularUpdates: [] as {
         poster: string;
         title: string;
@@ -164,6 +213,9 @@ export async function getHome(
           id: string;
         };
       }[],
+      /**
+       * The mangas in the latest releases section. if valid is false eveything will be empty
+       */
       latestReleases: [] as {
         poster: string;
         title: string;
@@ -178,3 +230,14 @@ export async function getHome(
     };
   }
 }
+
+// 0-0-0-4-2-1-3-0
+// 0-0-0-4-2-0-3-0
+// 0-0-0-4-2-2-3-0
+// 0-0-1-4-2-1-3-0
+// 0-0-1-4-2-2-3-0
+// 0-0-2-4-2-0-3-0
+// 0-0-2-4-2-2-3-0
+// 0-0-2-4-2-1-3-0
+
+//

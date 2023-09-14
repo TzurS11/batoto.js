@@ -3,7 +3,13 @@ import { isMature } from "./utils";
 import { axiosProxy, sources } from "./types";
 
 type options = {
+  /**
+   * incase https://bato.to goes down you can chagne the domain here. lits of mirror links https://rentry.co/batoto/raw
+   */
   baseURL?: sources;
+  /**
+   * Set up a rotating proxy to prevent IP blocking when you have many requests to bato.to
+   */
   proxy?: axiosProxy;
 };
 
@@ -177,7 +183,17 @@ export async function getRandom(
     );
 
     const randomComics = response.data.data.get_content_searchComic.items;
-    const list = [];
+    const list: {
+      id: string;
+      title: {
+        original: string;
+        synonyms: string[];
+      };
+      authors: string[];
+      poster: string;
+      genres: string[];
+      mature: boolean;
+    }[] = [];
     for (let i = 0; i < randomComics.length; i++) {
       const manga = randomComics[i].data;
       let mature = false;
@@ -197,12 +213,44 @@ export async function getRandom(
     }
 
     return {
+      /**
+       * the fetch url
+       */
       url: `${baseURL}/apo/`,
+      /**
+       * check if the fetch is valid and successful. always check if that is true before using results
+       */
       valid: true,
+      /**
+       * the mangas found. if valid is false eveything will be empty
+       */
       results: list,
     };
   } catch (error: any) {
     console.error(error.message);
-    return { url: `${baseURL}/apo/`, valid: false };
+    return {
+      /**
+       * the fetch url
+       */
+      url: `${baseURL}/apo/`,
+      /**
+       * check if the fetch is valid and successful. always check if that is true before using results
+       */
+      valid: false,
+      /**
+       * the mangas found. if valid is false eveything will be empty
+       */
+      results: [] as {
+        id: string;
+        title: {
+          original: string;
+          synonyms: string[];
+        };
+        authors: string[];
+        poster: string;
+        genres: string[];
+        mature: boolean;
+      }[],
+    };
   }
 }

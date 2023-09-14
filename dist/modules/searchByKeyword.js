@@ -35,9 +35,21 @@ async function searchByKeyword(keyword, options = {
         let document = await (0, utils_1.fetchHTML)(uri, options.proxy);
         if (document == null) {
             return {
+                /**
+                 * the search url.
+                 */
                 url: uri,
+                /**
+                 * check if the search is valid and successful. always check if that is true before using results or pages
+                 */
                 valid: false,
+                /**
+                 * list of mangas found. if valid is false eveything will be empty
+                 */
                 results: [],
+                /**
+                 * how many pages are in this search
+                 */
                 pages: 0,
             };
         }
@@ -96,18 +108,42 @@ async function searchByKeyword(keyword, options = {
             numOfPages = Number(pageAs[pageAs.length - 1].innerHTML);
         }
         return {
+            /**
+             * the search url.
+             */
             url: uri,
+            /**
+             * check if the search is valid and successful. always check if that is true before using results or pages
+             */
             valid: document.querySelector("#app-wrapper > main > div:nth-child(3) > button") == null,
+            /**
+             * list of mangas found. if valid is false eveything will be empty
+             */
             results: list,
+            /**
+             * how many pages are in this search
+             */
             pages: numOfPages,
         };
     }
     catch (e) {
         console.error(e);
         return {
+            /**
+             * the search url.
+             */
             url: uri,
+            /**
+             * check if the search is valid and successful. always check if that is true before using results or pages
+             */
             valid: false,
+            /**
+             * list of mangas found. if valid is false eveything will be empty
+             */
             results: [],
+            /**
+             * how many pages are in this search
+             */
             pages: 0,
         };
     }

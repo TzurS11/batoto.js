@@ -1,10 +1,19 @@
+/**
+ * Set up a rotating proxy to prevent IP blocking when you have many requests to bato.to
+ */
 export type axiosProxy = {
   auth?: { password: string; username: string };
+  /**
+   * ip or domain
+   */
   host: string;
   port: number;
   protocol?: string;
 };
 
+/**
+ * When searching a manga you can sort in different ways.
+ */
 export type sortOrder =
   | "field_score"
   | "field_follow"
@@ -15,6 +24,9 @@ export type sortOrder =
   | "field_public"
   | "field_name";
 
+/**
+ * the status of the manga.
+ */
 export type status =
   | "pending"
   | "ongoing"
@@ -22,6 +34,9 @@ export type status =
   | "hiatus"
   | "cancelled";
 
+/**
+ * list of sources you can use instead of https://bato.to incase the website goes down. lits of mirror links https://rentry.co/batoto/raw
+ */
 export type sources =
   | "https://bato.to"
   | "https://wto.to"
@@ -49,8 +64,14 @@ export type sources =
   | "https://zbato.net"
   | "https://zbato.org";
 
+/**
+ * list of languages the manga can originate from
+ */
 export type langOriginal = "zh" | "en" | "ja" | "ko";
 
+/**
+ * list of languages the manga can be translated to
+ */
 export type langTransalted =
   | "af"
   | "bg"
@@ -154,5 +175,3 @@ export type langTransalted =
   | "zh_hk"
   | "bn"
   | "be";
-
-// lits of mirror links https://rentry.co/batoto/raw

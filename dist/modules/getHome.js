@@ -21,9 +21,21 @@ async function getHome(options = {
         let document = await (0, utils_1.fetchHTML)(`${baseURL}/v3x`, options.proxy);
         if (document == null) {
             return {
+                /**
+                 * the url used to get the information.
+                 */
                 url: `${baseURL}/v3x`,
+                /**
+                 * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases
+                 */
                 valid: false,
+                /**
+                 * The mangas in the popular updates section. if valid is false eveything will be empty
+                 */
                 popularUpdates: [],
+                /**
+                 * The mangas in the latest releases section. if valid is false eveything will be empty
+                 */
                 latestReleases: [],
             };
         }
@@ -72,30 +84,69 @@ async function getHome(options = {
                     id: lastChapterAnchor.href.replace("/title/", "") || "",
                 };
             }
+            const genres = [];
+            let chapterSpans = (0, utils_1.querySelectorAllRegex)(currentDiv, "data-hk", /0-0-\d*-4-2-\d*-3-0/);
+            for (let j = 0; j < chapterSpans.length; j++) {
+                const currentSpan = chapterSpans[j];
+                genres.push(currentSpan.innerHTML);
+            }
             latestReleases.push({
                 poster: currentDiv_img.src || "",
                 title: currentDiv_img.alt || "",
                 id: parent_currentDiv_img.href.replace("/title/", "") || "",
-                mature: true,
-                genres: [],
+                mature: (0, utils_1.isMature)(genres),
+                genres: genres,
                 lastChapter: lastChapter,
             });
         }
         return {
+            /**
+             * the url used to get the information.
+             */
             url: `${baseURL}/v3x`,
+            /**
+             * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases
+             */
             valid: true,
+            /**
+             * The mangas in the popular updates section. if valid is false eveything will be empty
+             */
             popularUpdates: popularUpdates,
+            /**
+             * The mangas in the latest releases section. if valid is false eveything will be empty
+             */
             latestReleases: latestReleases,
         };
     }
     catch (error) {
         console.error(error);
         return {
+            /**
+             * the url used to get the information.
+             */
             url: `${baseURL}/v3x`,
+            /**
+             * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases
+             */
             valid: false,
+            /**
+             * The mangas in the popular updates section. if valid is false eveything will be empty
+             */
             popularUpdates: [],
+            /**
+             * The mangas in the latest releases section. if valid is false eveything will be empty
+             */
             latestReleases: [],
         };
     }
 }
 exports.getHome = getHome;
+// 0-0-0-4-2-1-3-0
+// 0-0-0-4-2-0-3-0
+// 0-0-0-4-2-2-3-0
+// 0-0-1-4-2-1-3-0
+// 0-0-1-4-2-2-3-0
+// 0-0-2-4-2-0-3-0
+// 0-0-2-4-2-2-3-0
+// 0-0-2-4-2-1-3-0
+//

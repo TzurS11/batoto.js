@@ -15,13 +15,37 @@ import {
 } from "./types";
 
 type options = {
+  /**
+   * Set up a rotating proxy to prevent IP blocking when you have many requests to bato.to
+   */
   proxy?: axiosProxy;
+  /**
+   * if there is more than one page for this search you can change the page here.
+   */
   page?: number;
+  /**
+   * incase https://bato.to goes down you can chagne the domain here. lits of mirror links https://rentry.co/batoto/raw
+   */
   baseURL?: sources;
+  /**
+   * original language of the manga
+   */
   originalLanguage?: langOriginal[];
+  /**
+   * the language the manga is currently in. the translated version
+   */
   translatedLanguage?: langTransalted[];
+  /**
+   * sort results in a different way
+   */
   sort?: sortOrder;
+  /**
+   * the status of the manga not related to bato.to
+   */
   workStatus?: status;
+  /**
+   * the upload status of the manga related to bato.to
+   */
   uploadStatus?: status;
 };
 
@@ -71,8 +95,17 @@ export async function searchByKeyword(
     let document = await fetchHTML(uri, options.proxy);
     if (document == null) {
       return {
+        /**
+         * the search url.
+         */
         url: uri,
+        /**
+         * check if the search is valid and successful. always check if that is true before using results or pages
+         */
         valid: false,
+        /**
+         * list of mangas found. if valid is false eveything will be empty
+         */
         results: [] as {
           id: string;
           title: { original: string; synonyms: string[] };
@@ -81,6 +114,9 @@ export async function searchByKeyword(
           genres: string[];
           mature: boolean;
         }[],
+        /**
+         * how many pages are in this search
+         */
         pages: 0,
       };
     }
@@ -175,19 +211,40 @@ export async function searchByKeyword(
       numOfPages = Number(pageAs[pageAs.length - 1].innerHTML);
     }
     return {
+      /**
+       * the search url.
+       */
       url: uri,
+      /**
+       * check if the search is valid and successful. always check if that is true before using results or pages
+       */
       valid:
         document.querySelector(
           "#app-wrapper > main > div:nth-child(3) > button"
         ) == null,
+      /**
+       * list of mangas found. if valid is false eveything will be empty
+       */
       results: list,
+      /**
+       * how many pages are in this search
+       */
       pages: numOfPages,
     };
   } catch (e) {
     console.error(e);
     return {
+      /**
+       * the search url.
+       */
       url: uri,
+      /**
+       * check if the search is valid and successful. always check if that is true before using results or pages
+       */
       valid: false,
+      /**
+       * list of mangas found. if valid is false eveything will be empty
+       */
       results: [] as {
         id: string;
         title: { original: string; synonyms: string[] };
@@ -196,6 +253,9 @@ export async function searchByKeyword(
         genres: string[];
         mature: boolean;
       }[],
+      /**
+       * how many pages are in this search
+       */
       pages: 0,
     };
   }

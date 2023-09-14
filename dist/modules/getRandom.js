@@ -185,14 +185,36 @@ async function getRandom(options = {
             });
         }
         return {
+            /**
+             * the fetch url
+             */
             url: `${baseURL}/apo/`,
+            /**
+             * check if the fetch is valid and successful. always check if that is true before using results
+             */
             valid: true,
+            /**
+             * the mangas found. if valid is false eveything will be empty
+             */
             results: list,
         };
     }
     catch (error) {
         console.error(error.message);
-        return { url: `${baseURL}/apo/`, valid: false };
+        return {
+            /**
+             * the fetch url
+             */
+            url: `${baseURL}/apo/`,
+            /**
+             * check if the fetch is valid and successful. always check if that is true before using results
+             */
+            valid: false,
+            /**
+             * the mangas found. if valid is false eveything will be empty
+             */
+            results: [],
+        };
     }
 }
 exports.getRandom = getRandom;

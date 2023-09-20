@@ -129,4 +129,9 @@ out
 src/test
 test.ts
 test.js
+tests
+# cache folder
 cache
+
+# chapter downloads
+downloads

@@ -1,7 +1,9 @@
 import { convertSpecialCharsToUnicode, fetchHTML, isPageValid } from "./utils";
-
+import axios from "axios";
 import * as fs from "fs";
+import * as archiver from "archiver";
 import { axiosProxy, sources } from "./types";
+import * as path from "path";
 
 type options = {
   /**
@@ -55,10 +57,28 @@ export async function getChapterByID(
           cacheFile[chapterID].pages[0] != undefined &&
           isPageValid(cacheFile[chapterID].pages[0])
         ) {
-          return cacheFile[chapterID] as {
-            url: string;
-            valid: boolean;
-            pages: string[];
+          return {
+            ...(cacheFile[chapterID] as {
+              url: string;
+              valid: boolean;
+              pages: string[];
+            }),
+            /**
+             * Export all the pages to a zip file. can be used forever since it wont become expired.
+             * @param path the path to download the zip to. if not specified: ./downloads/{chapterID}
+             */
+            downloadZip: async function (
+              path = `./downloads/${chapterID.replace(/\//g, "-")}`
+            ) {
+              if (cacheFile[chapterID].pages.length == 0)
+                return console.error(
+                  "Invalid response. check by seeing if valid is false."
+                );
+              return await downloadAndZipImages(
+                cacheFile[chapterID].pages,
+                path
+              );
+            },
           };
         }
       }
@@ -82,6 +102,15 @@ export async function getChapterByID(
          * List of image addresses. if valid is false the array will be empty
          */
         pages: [] as string[],
+        /**
+         * Export all the pages to a zip file. can be used forever since it wont become expired.
+         * @param path the path to download the zip to. if not specified: ./downloads/{chapterID}
+         */
+        downloadZip: async function (
+          path = `./downloads/${chapterID.replace(/\//g, "-")}`
+        ) {
+          console.error("Invalid response. check by seeing if valid is false.");
+        },
       };
     }
 
@@ -137,6 +166,19 @@ export async function getChapterByID(
        * List of image addresses. if valid is false the array will be empty
        */
       pages: pages,
+      /**
+       * Export all the pages to a zip file. can be used forever since it wont become expired.
+       * @param path the path to download the zip to. if not specified: ./downloads/{chapterID}
+       */
+      downloadZip: async function (
+        path = `./downloads/${chapterID.replace(/\//g, "-")}`
+      ) {
+        if (pages.length == 0)
+          return console.error(
+            "Invalid response. check by seeing if valid is false."
+          );
+        return await downloadAndZipImages(pages, path);
+      },
     };
   } catch (error) {
     console.error(error);
@@ -153,6 +195,67 @@ export async function getChapterByID(
        * List of image addresses. if valid is false the array will be empty
        */
       pages: [] as string[],
+      /**
+       * Export all the pages to a zip file. can be used forever since it wont become expired.
+       * @param path the path to download the zip to. if not specified: ./downloads/{chapterID}
+       */
+      downloadZip: async function (
+        path = `./downloads/${chapterID.replace(/\//g, "-")}`
+      ) {
+        console.error("Invalid response. check by seeing if valid is false.");
+      },
     };
   }
+}
+
+async function downloadAndZipImages(
+  imageUrls: string[],
+  outputPath: string
+): Promise<void> {
+  if (!outputPath.endsWith(".zip")) {
+    outputPath += ".zip";
+  }
+
+  return new Promise(async (resolve, reject) => {
+    const outputDirectory = path.dirname(outputPath);
+
+    // Ensure that the output directory exists
+    if (!fs.existsSync(outputDirectory)) {
+      fs.mkdirSync(outputDirectory, { recursive: true });
+    }
+
+    const output = fs.createWriteStream(outputPath);
+    const archive = archiver("zip", { zlib: { level: 9 } });
+
+    archive.pipe(output);
+
+    archive.on("error", (error) => {
+      reject(error);
+    });
+
+    archive.on("finish", () => {
+      resolve();
+    });
+
+    for (let i = 0; i < imageUrls.length; i++) {
+      const imageUrl = imageUrls[i];
+      const imageExtension = path.extname(imageUrl);
+      const imageName = `image_${i}${imageExtension.split("?")[0]}`;
+
+      try {
+        const response = await axios.get(imageUrl, { responseType: "stream" });
+        if (response.status === 200) {
+          archive.append(response.data, { name: imageName });
+        } else {
+          console.error(
+            `Failed to download ${imageName}: ${response.statusText}`
+          );
+        }
+      } catch (error) {
+        console.error(`Error downloading ${imageName}: ${error.message}`);
+      }
+    }
+
+    archive.finalize();
+  });
 }

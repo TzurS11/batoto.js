@@ -12,6 +12,7 @@ type options = {
   baseURL?: sources;
   /**
    * converts all special chars so you can handle it as a url.
+   * if you need to pass the image in a url then it will cause problems with special chars
    */
   unicode?: boolean;
   /**
@@ -22,6 +23,51 @@ type options = {
    * Set up a rotating proxy to prevent IP blocking when you have many requests to bato.to
    */
   proxy?: axiosProxy;
+};
+
+type ChapterResult = {
+  /**
+   * the url used to get the chapter.
+   */
+  url: string;
+  /**
+   * check if the scrape is valid and successful. always check if that is true before using pages or downloadZip
+   */
+  valid: true;
+  /**
+   * List of image addresses.
+   */
+  pages: string[];
+  /**
+   * Export all the pages to a zip file. can be used forever since it wont become expired.
+   * @param path the path to download the zip to. if not specified: ./downloads/{chapterID}
+   */
+  downloadZip: (path?: string) => Promise<void>;
+};
+
+type InvalidChapterResult = {
+  /**
+   * the url used to get the chapter.
+   */
+  url: string;
+  /**
+   * check if the scrape is valid and successful. always check if that is true before using pages or downloadZip
+   */
+  valid: false;
+  /**
+   * ```js
+   * THIS MIGHT BE INVALID
+   * if (valid == false) return;
+   * ```
+   */
+  pages?: never;
+  /**
+   * ```js
+   * THIS MIGHT BE INVALID
+   * if (valid == false) return;
+   * ```
+   */
+  downloadZip?: never;
 };
 
 /**
@@ -42,7 +88,7 @@ export async function getChapterByID(
       protocol: undefined,
     },
   }
-) {
+): Promise<ChapterResult | InvalidChapterResult> {
   const baseURL = options.baseURL || "https://bato.to";
   const unicode = options.unicode || false;
   const cache = options.cache !== undefined ? options.cache : false;
@@ -63,10 +109,6 @@ export async function getChapterByID(
               valid: boolean;
               pages: string[];
             }),
-            /**
-             * Export all the pages to a zip file. can be used forever since it wont become expired.
-             * @param path the path to download the zip to. if not specified: ./downloads/{chapterID}
-             */
             downloadZip: async function (
               path = `./downloads/${chapterID.replace(/\//g, "-")}`
             ) {
@@ -79,7 +121,7 @@ export async function getChapterByID(
                 path
               );
             },
-          };
+          } as ChapterResult;
         }
       }
     }
@@ -90,28 +132,9 @@ export async function getChapterByID(
     );
     if (document == null) {
       return {
-        /**
-         * the url used to get the chapter.
-         */
         url: `${baseURL}/title/${chapterID}`,
-        /**
-         * check if the scrape is valid and successful. always check if that is true before using pages
-         */
         valid: false,
-        /**
-         * List of image addresses. if valid is false the array will be empty
-         */
-        pages: [] as string[],
-        /**
-         * Export all the pages to a zip file. can be used forever since it wont become expired.
-         * @param path the path to download the zip to. if not specified: ./downloads/{chapterID}
-         */
-        downloadZip: async function (
-          path = `./downloads/${chapterID.replace(/\//g, "-")}`
-        ) {
-          console.error("Invalid response. check by seeing if valid is false.");
-        },
-      };
+      } as InvalidChapterResult;
     }
 
     const astroisland = document.getElementsByTagName("astro-island");
@@ -153,58 +176,28 @@ export async function getChapterByID(
         fs.writeFileSync("./cache/chapters.json", JSON.stringify(file));
       }
     }
+    if (pages.length > 0) {
+      return {
+        url: `${baseURL}/title/${chapterID}`,
+        valid: true,
+        pages: pages,
+        downloadZip: async function (
+          path = `./downloads/${chapterID.replace(/\//g, "-")}`
+        ) {
+          return await downloadAndZipImages(pages, path);
+        },
+      } as ChapterResult;
+    }
     return {
-      /**
-       * the url used to get the chapter.
-       */
       url: `${baseURL}/title/${chapterID}`,
-      /**
-       * check if the scrape is valid and successful. always check if that is true before using pages
-       */
-      valid: pages.length == 0 ? false : true,
-      /**
-       * List of image addresses. if valid is false the array will be empty
-       */
-      pages: pages,
-      /**
-       * Export all the pages to a zip file. can be used forever since it wont become expired.
-       * @param path the path to download the zip to. if not specified: ./downloads/{chapterID}
-       */
-      downloadZip: async function (
-        path = `./downloads/${chapterID.replace(/\//g, "-")}`
-      ) {
-        if (pages.length == 0)
-          return console.error(
-            "Invalid response. check by seeing if valid is false."
-          );
-        return await downloadAndZipImages(pages, path);
-      },
-    };
+      valid: false,
+    } as InvalidChapterResult;
   } catch (error) {
     console.error(error);
     return {
-      /**
-       * the url used to get the chapter.
-       */
       url: `${baseURL}/title/${chapterID}`,
-      /**
-       * check if the scrape is valid and successful. always check if that is true before using pages
-       */
       valid: false,
-      /**
-       * List of image addresses. if valid is false the array will be empty
-       */
-      pages: [] as string[],
-      /**
-       * Export all the pages to a zip file. can be used forever since it wont become expired.
-       * @param path the path to download the zip to. if not specified: ./downloads/{chapterID}
-       */
-      downloadZip: async function (
-        path = `./downloads/${chapterID.replace(/\//g, "-")}`
-      ) {
-        console.error("Invalid response. check by seeing if valid is false.");
-      },
-    };
+    } as InvalidChapterResult;
   }
 }
 

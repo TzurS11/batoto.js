@@ -49,11 +49,57 @@ type options = {
   uploadStatus?: status;
 };
 
-/**
- * Get list of mangas from a keyword. Example: Kimetsu no Yaiba, Demon Slayer
- * @param keyword The text value.
- * @param options Options for getting the information.
- */
+type SearchResult = {
+  /**
+   * the search url.
+   */
+  url: string;
+  /**
+   * check if the search is valid and successful. always check if that is true before using results or pages
+   */
+  valid: true;
+  /**
+   * list of mangas found.
+   */
+  results: {
+    id: string;
+    title: { original: string; synonyms: string[] };
+    authors: string[];
+    poster: string;
+    genres: string[];
+    mature: boolean;
+  }[];
+  /**
+   * how many pages are in this search
+   */
+  pages: number;
+};
+
+type InvalidSearchResult = {
+  /**
+   * the search url.
+   */
+  url: string;
+  /**
+   * check if the search is valid and successful. always check if that is true before using results or pages
+   */
+  valid: false;
+  /**
+   * ```js
+   * THIS MIGHT BE INVALID
+   * if (valid == false) return;
+   * ```
+   */
+  results?: never;
+  /**
+   * ```js
+   * THIS MIGHT BE INVALID
+   * if (valid == false) return;
+   * ```
+   */
+  pages?: never;
+};
+
 export async function searchByKeyword(
   keyword: string,
   options: options = {
@@ -71,7 +117,7 @@ export async function searchByKeyword(
     workStatus: "" as status,
     uploadStatus: "" as status,
   }
-) {
+): Promise<SearchResult | InvalidSearchResult> {
   const baseURL = options.baseURL || "https://bato.to";
   const page = options.page || 1;
   const orig = convertLangArrayToString(options.originalLanguage || []);
@@ -95,29 +141,8 @@ export async function searchByKeyword(
     let document = await fetchHTML(uri, options.proxy);
     if (document == null) {
       return {
-        /**
-         * the search url.
-         */
         url: uri,
-        /**
-         * check if the search is valid and successful. always check if that is true before using results or pages
-         */
         valid: false,
-        /**
-         * list of mangas found. if valid is false eveything will be empty
-         */
-        results: [] as {
-          id: string;
-          title: { original: string; synonyms: string[] };
-          authors: string[];
-          poster: string;
-          genres: string[];
-          mature: boolean;
-        }[],
-        /**
-         * how many pages are in this search
-         */
-        pages: 0,
       };
     }
     const matchingElements = querySelectorAllRegex(
@@ -203,60 +228,22 @@ export async function searchByKeyword(
 
     const pages = document.querySelector('[data-hk="0-0-4-0-0"]');
 
-    //0-0-4-0-1-3-2-0
-    //0-0-4-0-1-5-2-0
     let numOfPages = 0;
     if (pages != null) {
       let pageAs = querySelectorAllRegex(pages, "data-hk", /0-0-4-0-1-\d*-2-0/);
       numOfPages = Number(pageAs[pageAs.length - 1].innerHTML);
     }
     return {
-      /**
-       * the search url.
-       */
       url: uri,
-      /**
-       * check if the search is valid and successful. always check if that is true before using results or pages
-       */
-      valid:
-        document.querySelector(
-          "#app-wrapper > main > div:nth-child(3) > button"
-        ) == null,
-      /**
-       * list of mangas found. if valid is false eveything will be empty
-       */
+      valid: true,
       results: list,
-      /**
-       * how many pages are in this search
-       */
       pages: numOfPages,
     };
   } catch (e) {
     console.error(e);
     return {
-      /**
-       * the search url.
-       */
       url: uri,
-      /**
-       * check if the search is valid and successful. always check if that is true before using results or pages
-       */
       valid: false,
-      /**
-       * list of mangas found. if valid is false eveything will be empty
-       */
-      results: [] as {
-        id: string;
-        title: { original: string; synonyms: string[] };
-        authors: string[];
-        poster: string;
-        genres: string[];
-        mature: boolean;
-      }[],
-      /**
-       * how many pages are in this search
-       */
-      pages: 0,
     };
   }
 }

@@ -46,66 +46,8 @@ async function getByID(id, options = {
         const document = await (0, utils_1.fetchHTML)(`${baseURL}/title/${id}`, options.proxy);
         if (document == null) {
             return {
-                /**
-                 * the url that uas used to scrape
-                 */
                 url: `${baseURL}/title/${id}`,
-                /**
-                 * check if the scrape is valid and successful. always check if that is true before using any of the results
-                 */
                 valid: false,
-                /**
-                 * the id of the manga. if valid is false the array will be empty
-                 */
-                id: "",
-                /**
-                 * the title of the manga. if valid is false the array will be empty
-                 */
-                title: { original: "", synonyms: [] },
-                /**
-                 * the language of the manga. translated is the language of the manga that was scraped. if valid is false the array will be empty
-                 */
-                languages: { original: "", translated: "" },
-                /**
-                 * the description of the manga. if valid is false the array will be empty
-                 */
-                description: "",
-                /**
-                 * the authors. if valid is false the array will be empty
-                 */
-                authors: [],
-                /**
-                 * the artists. if valid is false the array will be empty
-                 */
-                artists: [],
-                /**
-                 * image address of the poster. if valid is false the array will be empty
-                 */
-                poster: "",
-                /**
-                 * the generes of the manga. if valid is false the array will be empty
-                 */
-                genres: "",
-                /**
-                 * the score on bato.to. if valid is false the array will be empty
-                 */
-                score: 0,
-                /**
-                 * the status of the manga. if valid is false the array will be empty
-                 */
-                status: "",
-                /**
-                 * read direction of the manga. left to right, right to left, top to bottom. if valid is false the array will be empty
-                 */
-                readDirection: "",
-                /**
-                 * is the manga 18+. if valid is false the array will be empty
-                 */
-                mature: false,
-                /**
-                 * list of chapters. if disabled in options the array will be empty. if valid is false the array will be empty
-                 */
-                chapters: [],
             };
         }
         let data = JSON.parse(document.querySelector('[prefix="r20"]').getAttribute("props")).data[1];
@@ -164,131 +106,30 @@ async function getByID(id, options = {
             translated: data.tranLang[1] || "",
         };
         return {
-            /**
-             * the url that uas used to scrape
-             */
             url: `${baseURL}/title/${id}`,
-            /**
-             * check if the scrape is valid and successful. always check if that is true before using any of the results
-             */
             valid: true,
-            /**
-             * the id of the manga. if valid is false the array will be empty
-             */
-            id: mangaID || "",
-            /**
-             * the title of the manga. if valid is false the array will be empty
-             */
-            title: title,
-            /**
-             * the language of the manga. translated is the language of the manga that was scraped. if valid is false the array will be empty
-             */
-            languages: languages,
-            /**
-             * the description of the manga. if valid is false the array will be empty
-             */
-            description: description || "",
-            /**
-             * the authors. if valid is false the array will be empty
-             */
-            authors: authors,
-            /**
-             * the artists. if valid is false the array will be empty
-             */
-            artists: artists,
-            /**
-             * image address of the poster. if valid is false the array will be empty
-             */
-            poster: poster || "",
-            /**
-             * the generes of the manga. if valid is false the array will be empty
-             */
-            genres: genres,
-            /**
-             * the score on bato.to. if valid is false the array will be empty
-             */
-            score: score || 0,
-            /**
-             * the status of the manga. if valid is false the array will be empty
-             */
-            status: status || "",
-            /**
-             * read direction of the manga. left to right, right to left, top to bottom. if valid is false the array will be empty
-             */
-            readDirection: readDirection || "",
-            /**
-             * is the manga 18+. if valid is false the array will be empty
-             */
-            mature: (0, utils_1.isMature)(genres),
-            /**
-             * list of chapters. if disabled in options the array will be empty. if valid is false the array will be empty
-             */
-            chapters: chaptersArray,
+            results: {
+                id: mangaID || "",
+                title: title,
+                languages: languages,
+                description: description || "",
+                authors: authors,
+                artists: artists,
+                poster: poster || "",
+                genres: genres,
+                score: score || 0,
+                status: status || "",
+                readDirection: readDirection || "",
+                mature: (0, utils_1.isMature)(genres),
+                chapters: chaptersArray,
+            },
         };
     }
     catch (e) {
         console.error(e);
         return {
-            /**
-             * the url that uas used to scrape
-             */
             url: `${baseURL}/title/${id}`,
-            /**
-             * check if the scrape is valid and successful. always check if that is true before using any of the results
-             */
             valid: false,
-            /**
-             * the id of the manga. if valid is false the array will be empty
-             */
-            id: "",
-            /**
-             * the title of the manga. if valid is false the array will be empty
-             */
-            title: { original: "", synonyms: [] },
-            /**
-             * the language of the manga. translated is the language of the manga that was scraped. if valid is false the array will be empty
-             */
-            languages: { original: "", translated: "" },
-            /**
-             * the description of the manga. if valid is false the array will be empty
-             */
-            description: "",
-            /**
-             * the authors. if valid is false the array will be empty
-             */
-            authors: [],
-            /**
-             * the artists. if valid is false the array will be empty
-             */
-            artists: [],
-            /**
-             * image address of the poster. if valid is false the array will be empty
-             */
-            poster: "",
-            /**
-             * the generes of the manga. if valid is false the array will be empty
-             */
-            genres: "",
-            /**
-             * the score on bato.to. if valid is false the array will be empty
-             */
-            score: 0,
-            /**
-             * the status of the manga. if valid is false the array will be empty
-             */
-            status: "",
-            /**
-             * read direction of the manga. left to right, right to left, top to bottom. if valid is false the array will be empty
-             */
-            readDirection: "",
-            /**
-             * is the manga 18+. if valid is false the array will be empty
-             */
-            mature: false,
-            /**
-             * list of chapters. if disabled in options the array will be empty. if valid is false the array will be empty
-             */
-            chapters: [],
         };
     }
 }

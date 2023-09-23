@@ -2,7 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getChapterByID = void 0;
 const utils_1 = require("./utils");
+const axios_1 = require("axios");
 const fs = require("fs");
+const archiver = require("archiver");
+const path = require("path");
 /**
  * Get all images from a chapter by id.
  * @param chapterID The id of the chapter. get chapter id from getByID
@@ -28,25 +31,22 @@ async function getChapterByID(chapterID, options = {
             if (cacheFile[chapterID]) {
                 if (cacheFile[chapterID].pages[0] != undefined &&
                     (0, utils_1.isPageValid)(cacheFile[chapterID].pages[0])) {
-                    return cacheFile[chapterID];
+                    return {
+                        ...cacheFile[chapterID],
+                        downloadZip: async function (path = `./downloads/${chapterID.replace(/\//g, "-")}`) {
+                            if (cacheFile[chapterID].pages.length == 0)
+                                return console.error("Invalid response. check by seeing if valid is false.");
+                            return await downloadAndZipImages(cacheFile[chapterID].pages, path);
+                        },
+                    };
                 }
             }
         }
         const document = await (0, utils_1.fetchHTML)(`${baseURL}/title/${chapterID}`, options.proxy);
         if (document == null) {
             return {
-                /**
-                 * the url used to get the chapter.
-                 */
                 url: `${baseURL}/title/${chapterID}`,
-                /**
-                 * check if the scrape is valid and successful. always check if that is true before using pages
-                 */
                 valid: false,
-                /**
-                 * List of image addresses. if valid is false the array will be empty
-                 */
-                pages: [],
             };
         }
         const astroisland = document.getElementsByTagName("astro-island");
@@ -84,37 +84,66 @@ async function getChapterByID(chapterID, options = {
                 fs.writeFileSync("./cache/chapters.json", JSON.stringify(file));
             }
         }
+        if (pages.length > 0) {
+            return {
+                url: `${baseURL}/title/${chapterID}`,
+                valid: true,
+                pages: pages,
+                downloadZip: async function (path = `./downloads/${chapterID.replace(/\//g, "-")}`) {
+                    return await downloadAndZipImages(pages, path);
+                },
+            };
+        }
         return {
-            /**
-             * the url used to get the chapter.
-             */
             url: `${baseURL}/title/${chapterID}`,
-            /**
-             * check if the scrape is valid and successful. always check if that is true before using pages
-             */
-            valid: pages.length == 0 ? false : true,
-            /**
-             * List of image addresses. if valid is false the array will be empty
-             */
-            pages: pages,
+            valid: false,
         };
     }
     catch (error) {
         console.error(error);
         return {
-            /**
-             * the url used to get the chapter.
-             */
             url: `${baseURL}/title/${chapterID}`,
-            /**
-             * check if the scrape is valid and successful. always check if that is true before using pages
-             */
             valid: false,
-            /**
-             * List of image addresses. if valid is false the array will be empty
-             */
-            pages: [],
         };
     }
 }
 exports.getChapterByID = getChapterByID;
+async function downloadAndZipImages(imageUrls, outputPath) {
+    if (!outputPath.endsWith(".zip")) {
+        outputPath += ".zip";
+    }
+    return new Promise(async (resolve, reject) => {
+        const outputDirectory = path.dirname(outputPath);
+        // Ensure that the output directory exists
+        if (!fs.existsSync(outputDirectory)) {
+            fs.mkdirSync(outputDirectory, { recursive: true });
+        }
+        const output = fs.createWriteStream(outputPath);
+        const archive = archiver("zip", { zlib: { level: 9 } });
+        archive.pipe(output);
+        archive.on("error", (error) => {
+            reject(error);
+        });
+        archive.on("finish", () => {
+            resolve();
+        });
+        for (let i = 0; i < imageUrls.length; i++) {
+            const imageUrl = imageUrls[i];
+            const imageExtension = path.extname(imageUrl);
+            const imageName = `image_${i}${imageExtension.split("?")[0]}`;
+            try {
+                const response = await axios_1.default.get(imageUrl, { responseType: "stream" });
+                if (response.status === 200) {
+                    archive.append(response.data, { name: imageName });
+                }
+                else {
+                    console.error(`Failed to download ${imageName}: ${response.statusText}`);
+                }
+            }
+            catch (error) {
+                console.error(`Error downloading ${imageName}: ${error.message}`);
+            }
+        }
+        archive.finalize();
+    });
+}

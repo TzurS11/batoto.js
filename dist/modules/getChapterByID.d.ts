@@ -6,6 +6,7 @@ type options = {
     baseURL?: sources;
     /**
      * converts all special chars so you can handle it as a url.
+     * if you need to pass the image in a url then it will cause problems with special chars
      */
     unicode?: boolean;
     /**
@@ -17,14 +18,53 @@ type options = {
      */
     proxy?: axiosProxy;
 };
+type ChapterResult = {
+    /**
+     * the url used to get the chapter.
+     */
+    url: string;
+    /**
+     * check if the scrape is valid and successful. always check if that is true before using pages or downloadZip
+     */
+    valid: true;
+    /**
+     * List of image addresses.
+     */
+    pages: string[];
+    /**
+     * Export all the pages to a zip file. can be used forever since it wont become expired.
+     * @param path the path to download the zip to. if not specified: ./downloads/{chapterID}
+     */
+    downloadZip: (path?: string) => Promise<void>;
+};
+type InvalidChapterResult = {
+    /**
+     * the url used to get the chapter.
+     */
+    url: string;
+    /**
+     * check if the scrape is valid and successful. always check if that is true before using pages or downloadZip
+     */
+    valid: false;
+    /**
+     * ```js
+     * THIS MIGHT BE INVALID
+     * if (valid == false) return;
+     * ```
+     */
+    pages?: never;
+    /**
+     * ```js
+     * THIS MIGHT BE INVALID
+     * if (valid == false) return;
+     * ```
+     */
+    downloadZip?: never;
+};
 /**
  * Get all images from a chapter by id.
  * @param chapterID The id of the chapter. get chapter id from getByID
  * @param options Options for getting the information
  */
-export declare function getChapterByID(chapterID: string, options?: options): Promise<{
-    url: string;
-    valid: boolean;
-    pages: string[];
-}>;
+export declare function getChapterByID(chapterID: string, options?: options): Promise<ChapterResult | InvalidChapterResult>;
 export {};

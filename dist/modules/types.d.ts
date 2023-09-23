@@ -1,3 +1,4 @@
+type ProxyType = "http" | "https" | "socks5" | "socks5h";
 /**
  * Set up a rotating proxy to prevent IP blocking when you have many requests to bato.to
  */
@@ -6,12 +7,9 @@ export type axiosProxy = {
         password: string;
         username: string;
     };
-    /**
-     * ip or domain
-     */
     host: string;
     port: number;
-    protocol?: string;
+    protocol?: ProxyType;
 };
 /**
  * When searching a manga you can sort in different ways.
@@ -33,3 +31,4 @@ export type langOriginal = "zh" | "en" | "ja" | "ko";
  * list of languages the manga can be translated to
  */
 export type langTransalted = "af" | "bg" | "bs" | "hr" | "cs" | "ka" | "fr" | "hi" | "hu" | "kk" | "kn" | "mk" | "mg" | "no" | "ne" | "rm" | "ru" | "th" | "sl" | "sk" | "te" | "vi" | "yo" | "zu" | "_t" | "to" | "es" | "sr" | "ps" | "ml" | "ku" | "ig" | "el" | "nl" | "km" | "am" | "sq" | "my" | "da" | "de" | "is" | "ko" | "ms" | "ny" | "sm" | "so" | "ti" | "tr" | "tk" | "sw" | "es_419" | "sh" | "st" | "pl" | "fa" | "mt" | "mi" | "lo" | "ky" | "id" | "ga" | "gu" | "gn" | "et" | "ceb" | "ca" | "ar" | "en" | "hy" | "az" | "zh" | "fo" | "ht" | "it" | "lv" | "mr" | "pt" | "sn" | "sv" | "uk" | "ur" | "uz" | "ta" | "tg" | "sd" | "si" | "ro" | "pt_br" | "mo" | "mn" | "lb" | "lt" | "ja" | "jv" | "he" | "ha" | "fil" | "fi" | "zh_tw" | "zh_hk" | "bn" | "be";
+export {};

@@ -12,6 +12,7 @@ export async function fetchHTML(
   url: string,
   proxy: axiosProxy
 ): Promise<Document | null> {
+  url.replace("https", "http");
   try {
     let response: AxiosResponse<any, any>;
     if (
@@ -21,6 +22,7 @@ export async function fetchHTML(
     ) {
       response = await axios.get(url);
     } else {
+      console.log(proxy);
       response = await axios.get(url, { proxy: proxy });
     }
 

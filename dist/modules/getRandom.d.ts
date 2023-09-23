@@ -1,7 +1,7 @@
 import { axiosProxy, sources } from "./types";
 type options = {
     /**
-     * incase https://bato.to goes down you can chagne the domain here. lits of mirror links https://rentry.co/batoto/raw
+     * incase https://bato.to goes down you can change the domain here. List of mirror links https://rentry.co/batoto/raw
      */
     baseURL?: sources;
     /**
@@ -9,12 +9,18 @@ type options = {
      */
     proxy?: axiosProxy;
 };
-/**
- * Get random mangas
- * @param options Options for getting the information.
- * @returns
- */
-export declare function getRandom(options?: options): Promise<{
+type Result = {
+    id: string;
+    title: {
+        original: string;
+        synonyms: string[];
+    };
+    authors: string[];
+    poster: string;
+    genres: string[];
+    mature: boolean;
+};
+type ValidResult = {
     /**
      * the fetch url
      */
@@ -22,20 +28,33 @@ export declare function getRandom(options?: options): Promise<{
     /**
      * check if the fetch is valid and successful. always check if that is true before using results
      */
-    valid: boolean;
+    valid: true;
     /**
-     * the mangas found. if valid is false eveything will be empty
+     * the mangas found.
      */
-    results: {
-        id: string;
-        title: {
-            original: string;
-            synonyms: string[];
-        };
-        authors: string[];
-        poster: string;
-        genres: string[];
-        mature: boolean;
-    }[];
-}>;
+    results: Result[];
+};
+type InvalidResult = {
+    /**
+     * the fetch url
+     */
+    url: string;
+    /**
+     * check if the fetch is valid and successful. always check if that is true before using results
+     */
+    valid: false;
+    /**
+   * ```js
+   * THIS MIGHT BE INVALID
+   * if (valid == false) return;
+   * ```
+   */
+    results?: never;
+};
+/**
+ * Get random mangas
+ * @param options Options for getting the information.
+ * @returns
+ */
+export declare function getRandom(options?: options): Promise<ValidResult | InvalidResult>;
 export {};

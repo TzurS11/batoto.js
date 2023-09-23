@@ -2,6 +2,72 @@ import { fetchHTML, querySelectorAllRegex, isMature } from "./utils";
 
 import { axiosProxy, sources } from "./types";
 
+type PopularUpdate = {
+  poster: string;
+  title: string;
+  id: string;
+  lastChapter: {
+    name: string;
+    id: string;
+  };
+};
+
+type LatestRelease = {
+  poster: string;
+  title: string;
+  id: string;
+  genres: string[];
+  mature: boolean;
+  lastChapter: {
+    name: string;
+    id: string;
+  };
+};
+
+type ValidResult = {
+  /**
+   * the url used to get the information.
+   */
+  url: string;
+  /**
+   * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases
+   */
+  valid: true;
+  /**
+   * The mangas in the popular updates section.
+   */
+  popularUpdates: PopularUpdate[];
+  /**
+   * The mangas in the latest releases section.
+   */
+  latestReleases: LatestRelease[];
+};
+
+type InvalidResult = {
+  /**
+   * the url used to get the information.
+   */
+  url: string;
+  /**
+   * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases.
+   */
+  valid: false;
+    /**
+   * ```js
+   * THIS MIGHT BE INVALID
+   * if (valid == false) return;
+   * ```
+   */
+  popularUpdates?: never;
+    /**
+   * ```js
+   * THIS MIGHT BE INVALID
+   * if (valid == false) return;
+   * ```
+   */
+  latestReleases?: never;
+};
+
 type options = {
   /**
    * incase https://bato.to goes down you can chagne the domain here. lits of mirror links https://rentry.co/batoto/raw
@@ -27,57 +93,17 @@ export async function getHome(
       protocol: undefined,
     },
   }
-) {
+): Promise<ValidResult | InvalidResult> {
   const baseURL = options.baseURL || "https://bato.to";
   try {
     let document = await fetchHTML(`${baseURL}/v3x`, options.proxy);
     if (document == null) {
       return {
-        /**
-         * the url used to get the information.
-         */
         url: `${baseURL}/v3x`,
-        /**
-         * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases
-         */
         valid: false,
-        /**
-         * The mangas in the popular updates section. if valid is false eveything will be empty
-         */
-        popularUpdates: [] as {
-          poster: string;
-          title: string;
-          id: string;
-          lastChapter: {
-            name: string;
-            id: string;
-          };
-        }[],
-        /**
-         * The mangas in the latest releases section. if valid is false eveything will be empty
-         */
-        latestReleases: [] as {
-          poster: string;
-          title: string;
-          id: string;
-          genres: string[];
-          mature: boolean;
-          lastChapter: {
-            name: string;
-            id: string;
-          };
-        }[],
-      };
+      } as InvalidResult;
     }
-    let popularUpdates: {
-      poster: string;
-      title: string;
-      id: string;
-      lastChapter: {
-        name: string;
-        id: string;
-      };
-    }[] = [];
+    let popularUpdates: PopularUpdate[] = [];
     let popularUpdatesWrapper = document.querySelector(
       "#app-wrapper > main > div:nth-child(3) > astro-island > div > div:nth-child(2) > astro-slot > div"
     );
@@ -107,17 +133,7 @@ export async function getHome(
         },
       });
     }
-    let latestReleases: {
-      poster: string;
-      title: string;
-      id: string;
-      genres: string[];
-      mature: boolean;
-      lastChapter: {
-        name: string;
-        id: string;
-      };
-    }[] = [];
+    let latestReleases: LatestRelease[] = [];
 
     let latestReleasesWrapper = document.querySelector(
       "#app-wrapper > main > div:nth-child(4) > astro-island > div > div.space-y-5 > astro-slot > div"
@@ -173,71 +189,16 @@ export async function getHome(
     }
 
     return {
-      /**
-       * the url used to get the information.
-       */
       url: `${baseURL}/v3x`,
-      /**
-       * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases
-       */
       valid: true,
-      /**
-       * The mangas in the popular updates section. if valid is false eveything will be empty
-       */
       popularUpdates: popularUpdates,
-      /**
-       * The mangas in the latest releases section. if valid is false eveything will be empty
-       */
       latestReleases: latestReleases,
     };
   } catch (error: any) {
     console.error(error);
     return {
-      /**
-       * the url used to get the information.
-       */
       url: `${baseURL}/v3x`,
-      /**
-       * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases
-       */
       valid: false,
-      /**
-       * The mangas in the popular updates section. if valid is false eveything will be empty
-       */
-      popularUpdates: [] as {
-        poster: string;
-        title: string;
-        id: string;
-        lastChapter: {
-          name: string;
-          id: string;
-        };
-      }[],
-      /**
-       * The mangas in the latest releases section. if valid is false eveything will be empty
-       */
-      latestReleases: [] as {
-        poster: string;
-        title: string;
-        id: string;
-        genres: string[];
-        mature: boolean;
-        lastChapter: {
-          name: string;
-          id: string;
-        };
-      }[],
-    };
+    } as InvalidResult;
   }
 }
-
-// 0-0-0-4-2-1-3-0
-// 0-0-0-4-2-0-3-0
-// 0-0-0-4-2-2-3-0
-// 0-0-1-4-2-1-3-0
-// 0-0-1-4-2-2-3-0
-// 0-0-2-4-2-0-3-0
-// 0-0-2-4-2-2-3-0
-// 0-0-2-4-2-1-3-0
-
-//

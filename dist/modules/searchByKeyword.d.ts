@@ -33,12 +33,7 @@ type options = {
      */
     uploadStatus?: status;
 };
-/**
- * Get list of mangas from a keyword. Example: Kimetsu no Yaiba, Demon Slayer
- * @param keyword The text value.
- * @param options Options for getting the information.
- */
-export declare function searchByKeyword(keyword: string, options?: options): Promise<{
+type SearchResult = {
     /**
      * the search url.
      */
@@ -46,9 +41,9 @@ export declare function searchByKeyword(keyword: string, options?: options): Pro
     /**
      * check if the search is valid and successful. always check if that is true before using results or pages
      */
-    valid: boolean;
+    valid: true;
     /**
-     * list of mangas found. if valid is false eveything will be empty
+     * list of mangas found.
      */
     results: {
         id: string;
@@ -65,5 +60,30 @@ export declare function searchByKeyword(keyword: string, options?: options): Pro
      * how many pages are in this search
      */
     pages: number;
-}>;
+};
+type InvalidSearchResult = {
+    /**
+     * the search url.
+     */
+    url: string;
+    /**
+     * check if the search is valid and successful. always check if that is true before using results or pages
+     */
+    valid: false;
+    /**
+     * ```js
+     * THIS MIGHT BE INVALID
+     * if (valid == false) return;
+     * ```
+     */
+    results?: never;
+    /**
+     * ```js
+     * THIS MIGHT BE INVALID
+     * if (valid == false) return;
+     * ```
+     */
+    pages?: never;
+};
+export declare function searchByKeyword(keyword: string, options?: options): Promise<SearchResult | InvalidSearchResult>;
 export {};

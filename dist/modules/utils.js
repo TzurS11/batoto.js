@@ -10,6 +10,7 @@ const url = require("url");
  * @returns
  */
 async function fetchHTML(url, proxy) {
+    url.replace("https", "http");
     try {
         let response;
         if (proxy == undefined ||
@@ -18,6 +19,7 @@ async function fetchHTML(url, proxy) {
             response = await axios_1.default.get(url);
         }
         else {
+            console.log(proxy);
             response = await axios_1.default.get(url, { proxy: proxy });
         }
         const dom = new jsdom_1.JSDOM(response.data);

@@ -1,4 +1,66 @@
 import { axiosProxy, sources } from "./types";
+type PopularUpdate = {
+    poster: string;
+    title: string;
+    id: string;
+    lastChapter: {
+        name: string;
+        id: string;
+    };
+};
+type LatestRelease = {
+    poster: string;
+    title: string;
+    id: string;
+    genres: string[];
+    mature: boolean;
+    lastChapter: {
+        name: string;
+        id: string;
+    };
+};
+type ValidResult = {
+    /**
+     * the url used to get the information.
+     */
+    url: string;
+    /**
+     * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases
+     */
+    valid: true;
+    /**
+     * The mangas in the popular updates section.
+     */
+    popularUpdates: PopularUpdate[];
+    /**
+     * The mangas in the latest releases section.
+     */
+    latestReleases: LatestRelease[];
+};
+type InvalidResult = {
+    /**
+     * the url used to get the information.
+     */
+    url: string;
+    /**
+     * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases.
+     */
+    valid: false;
+    /**
+   * ```js
+   * THIS MIGHT BE INVALID
+   * if (valid == false) return;
+   * ```
+   */
+    popularUpdates?: never;
+    /**
+   * ```js
+   * THIS MIGHT BE INVALID
+   * if (valid == false) return;
+   * ```
+   */
+    latestReleases?: never;
+};
 type options = {
     /**
      * incase https://bato.to goes down you can chagne the domain here. lits of mirror links https://rentry.co/batoto/raw
@@ -14,40 +76,5 @@ type options = {
  * @param options
  * @returns
  */
-export declare function getHome(options?: options): Promise<{
-    /**
-     * the url used to get the information.
-     */
-    url: string;
-    /**
-     * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases
-     */
-    valid: boolean;
-    /**
-     * The mangas in the popular updates section. if valid is false eveything will be empty
-     */
-    popularUpdates: {
-        poster: string;
-        title: string;
-        id: string;
-        lastChapter: {
-            name: string;
-            id: string;
-        };
-    }[];
-    /**
-     * The mangas in the latest releases section. if valid is false eveything will be empty
-     */
-    latestReleases: {
-        poster: string;
-        title: string;
-        id: string;
-        genres: string[];
-        mature: boolean;
-        lastChapter: {
-            name: string;
-            id: string;
-        };
-    }[];
-}>;
+export declare function getHome(options?: options): Promise<ValidResult | InvalidResult>;
 export {};

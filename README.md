@@ -6,7 +6,14 @@
 Scrape data from bato.to
 Download and stream mangas. search by name, author, get information about a manga.
 
+## DISCLAMER
+
+Please be aware that the use of this web scraping tool to extract data from the bato.to website **may potentially violate the website's Terms of Service**. I do not endorse or encourage activities that breach the TOS of any website.
+
+Before using this tool, it is your responsibility to review and comply with bato.to's Terms of Service, which may prohibit or restrict web scraping activities. If you choose to proceed with web scraping using this tool, you do so **at your own risk**, and you should be aware of the potential legal and ethical implications.
+
 ## Javascript example:
+Always check if valid property is true. Doesn't matter what you are using this package for.
 
 ```js
 const { getByID, getChapterByID, searchByKeyword } = require("batoto.js");
@@ -26,10 +33,16 @@ async function main() {
 
   // get information about the search by its id. this includes chapters
   let topManga = await getByID(topResult.id);
+  if (!topResult.valid) {
+    return console.log("Error getting the manga with the specified id.");
+  }
   console.log("got manga, all chapters");
 
   // get list of images from the chapter. this might take a second to load
   let chapter = await getChapterByID(topManga.chapters[0].id);
+  if (!chapter.valid) {
+    return console.log("Error getting the chapters with the specified chapter ID.");
+  }
   console.log(chapter.pages);
 }
 main();

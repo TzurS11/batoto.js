@@ -1,4 +1,5 @@
 import { axiosProxy, sources } from "./types";
+import { GetByIDoptions, InvalidMangaInfo, MangaInfo } from "./getByID";
 type options = {
     /**
      * incase https://bato.to goes down you can change the domain here. List of mirror links https://rentry.co/batoto/raw
@@ -19,6 +20,10 @@ type Result = {
     poster: string;
     genres: string[];
     mature: boolean;
+    /**
+     * Get more information that is not available just on the random results screen.
+     */
+    getAdditionalInfo: (additionalOptions?: GetByIDoptions) => Promise<MangaInfo | InvalidMangaInfo>;
 };
 type ValidResult = {
     /**
@@ -44,17 +49,16 @@ type InvalidResult = {
      */
     valid: false;
     /**
-   * ```js
-   * THIS MIGHT BE INVALID
-   * if (valid == false) return;
-   * ```
-   */
+     * ```js
+     * THIS MIGHT BE INVALID
+     * if (valid == false) return;
+     * ```
+     */
     results?: never;
 };
 /**
  * Get random mangas
  * @param options Options for getting the information.
- * @returns
  */
 export declare function getRandom(options?: options): Promise<ValidResult | InvalidResult>;
 export {};

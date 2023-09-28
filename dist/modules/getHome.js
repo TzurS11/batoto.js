@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getHome = void 0;
 const utils_1 = require("./utils");
+const getByID_1 = require("./getByID");
 /**
  * get all the the content in the home page.
  * @param options
@@ -37,13 +38,17 @@ async function getHome(options = {
             let lastChapterAnchor = currentDiv
                 .getElementsByClassName("link link-hover text-xs text-white line-clamp-1 visited:text-accent")
                 .item(0);
+            const id = parent_currentDiv_img.href.replace("/title/", "") || "";
             popularUpdates.push({
                 poster: currentDiv_img.src || "",
                 title: currentDiv_img.alt || "",
-                id: parent_currentDiv_img.href.replace("/title/", "") || "",
+                id,
                 lastChapter: {
                     name: lastChapterAnchor.innerHTML,
                     id: lastChapterAnchor.href.replace("/title/", "") || "",
+                },
+                getAdditionalInfo: async function (additionalOptions) {
+                    return await (0, getByID_1.getByID)(id, Object.assign({}, options, additionalOptions));
                 },
             });
         }
@@ -76,13 +81,17 @@ async function getHome(options = {
                 const currentSpan = chapterSpans[j];
                 genres.push(currentSpan.innerHTML);
             }
+            const id = parent_currentDiv_img.href.replace("/title/", "") || "";
             latestReleases.push({
                 poster: currentDiv_img.src || "",
                 title: currentDiv_img.alt || "",
-                id: parent_currentDiv_img.href.replace("/title/", "") || "",
+                id,
                 mature: (0, utils_1.isMature)(genres),
                 genres: genres,
                 lastChapter: lastChapter,
+                getAdditionalInfo: async function (additionalOptions) {
+                    return await (0, getByID_1.getByID)(id, Object.assign({}, options, additionalOptions));
+                },
             });
         }
         return {

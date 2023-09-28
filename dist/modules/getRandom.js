@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRandom = void 0;
 const axios_1 = require("axios");
 const utils_1 = require("./utils");
+const getByID_1 = require("./getByID");
 /**
  * Get random mangas
  * @param options Options for getting the information.
- * @returns
  */
 async function getRandom(options = {
     baseURL: "https://bato.to",
@@ -175,8 +175,9 @@ async function getRandom(options = {
             const genres = Array.from(manga.genres, String);
             if ((0, utils_1.isMature)(genres))
                 mature = true;
+            const id = String(manga.urlPath).replace("/title/", "");
             list.push({
-                id: String(manga.urlPath).replace("/title/", ""),
+                id,
                 title: {
                     original: String(manga.name),
                     synonyms: Array.from(manga.altNames, String),
@@ -185,6 +186,9 @@ async function getRandom(options = {
                 poster: String(manga.urlCoverOri),
                 genres: genres,
                 mature: mature,
+                getAdditionalInfo: async function (additionalOptions) {
+                    return await (0, getByID_1.getByID)(id, Object.assign({}, options, additionalOptions));
+                },
             });
         }
         return {

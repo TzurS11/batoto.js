@@ -1,5 +1,6 @@
 import { axiosProxy, sources } from "./types";
-type options = {
+import { GetByIDoptions, MangaInfo, InvalidMangaInfo } from "./getByID";
+export type getChapterByIDoptions = {
     /**
      * incase https://bato.to goes down you can chagne the domain here. lits of mirror links https://rentry.co/batoto/raw
      */
@@ -18,7 +19,7 @@ type options = {
      */
     proxy?: axiosProxy;
 };
-type ChapterResult = {
+export type ChapterResult = {
     /**
      * the url used to get the chapter.
      */
@@ -36,8 +37,12 @@ type ChapterResult = {
      * @param path the path to download the zip to. if not specified: ./downloads/{chapterID}
      */
     downloadZip: (path?: string) => Promise<void>;
+    /**
+     * Get more information that is not available just on the chapter page.
+     */
+    getAdditionalInfo: (additionalOptions?: GetByIDoptions) => Promise<MangaInfo | InvalidMangaInfo>;
 };
-type InvalidChapterResult = {
+export type InvalidChapterResult = {
     /**
      * the url used to get the chapter.
      */
@@ -60,11 +65,17 @@ type InvalidChapterResult = {
      * ```
      */
     downloadZip?: never;
+    /**
+     * ```js
+     * THIS MIGHT BE INVALID
+     * if (valid == false) return;
+     * ```
+     */
+    getAdditionalInfo?: never;
 };
 /**
  * Get all images from a chapter by id.
  * @param chapterID The id of the chapter. get chapter id from getByID
  * @param options Options for getting the information
  */
-export declare function getChapterByID(chapterID: string, options?: options): Promise<ChapterResult | InvalidChapterResult>;
-export {};
+export declare function getChapterByID(chapterID: string, options?: getChapterByIDoptions): Promise<ChapterResult | InvalidChapterResult>;

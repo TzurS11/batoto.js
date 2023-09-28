@@ -1,7 +1,13 @@
 import { fetchHTML, querySelectorAllRegex, isMature } from "./utils";
 import { axiosProxy, sources } from "./types";
+import {
+  ChapterResult,
+  InvalidChapterResult,
+  getChapterByID,
+  getChapterByIDoptions,
+} from "./getChapterByID";
 
-type options = {
+export type GetByIDoptions = {
   /**
    * incase https://bato.to goes down you can chagne the domain here. lits of mirror links https://rentry.co/batoto/raw
    */
@@ -104,10 +110,16 @@ type Results = {
     name: string;
     id: string;
     timestamp: number;
+    /**
+     * Get the chapter.
+     */
+    getChapter: (
+      additionalOptions?: getChapterByIDoptions
+    ) => Promise<ChapterResult | InvalidChapterResult>;
   }[];
 };
 
-type MangaInfo = {
+export type MangaInfo = {
   /**
    * the url used to get the information.
    */
@@ -122,7 +134,7 @@ type MangaInfo = {
   results: Results;
 };
 
-type InvalidMangaInfo = {
+export type InvalidMangaInfo = {
   /**
    * the url used to get the information.
    */
@@ -148,7 +160,7 @@ type InvalidMangaInfo = {
 // * @param {string} baseURL
 export async function getByID(
   id: string,
-  options: options = {
+  options: GetByIDoptions = {
     baseURL: "https://bato.to",
     noChapters: false,
     proxy: {
@@ -203,7 +215,17 @@ export async function getByID(
     const poster = data.urlCoverOri[1];
     const score = data.stat_score_avg[1];
 
-    let chaptersArray: { name: string; id: string; timestamp: number }[] = [];
+    let chaptersArray: {
+      name: string;
+      id: string;
+      timestamp: number;
+      /**
+       * Get the chapter.
+       */
+      getChapter: (
+        additionalOptions?: getChapterByIDoptions
+      ) => Promise<ChapterResult | InvalidChapterResult>;
+    }[] = [];
     if (noChapters == false) {
       let chaptersDivs = querySelectorAllRegex(
         document.querySelector(
@@ -224,13 +246,22 @@ export async function getByID(
             .item(0)
             .getAttribute("time");
           const timestamp = new Date(chapterTime).getTime();
+          const id = (chapter as HTMLAnchorElement).href.replace(
+            "/title/",
+            ""
+          ) as string;
           chaptersArray.push({
             name: chapter.innerHTML as string,
-            id: (chapter as HTMLAnchorElement).href.replace(
-              "/title/",
-              ""
-            ) as string,
+            id,
             timestamp: timestamp,
+            getChapter: async function (
+              additionalOptions?: getChapterByIDoptions
+            ) {
+              return await getChapterByID(
+                id,
+                Object.assign({}, options, additionalOptions)
+              );
+            },
           });
         }
       }

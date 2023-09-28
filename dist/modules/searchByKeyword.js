@@ -2,6 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.searchByKeyword = void 0;
 const utils_1 = require("./utils");
+const getByID_1 = require("./getByID");
+/**
+ * search mangas by keyword
+ * @param keyword The search keyword.
+ * @param options Options for getting the information.
+ */
 async function searchByKeyword(keyword, options = {
     proxy: {
         auth: { password: undefined, username: undefined },
@@ -78,6 +84,9 @@ async function searchByKeyword(keyword, options = {
                     : String(poster),
                 genres: currentGenres,
                 mature: mature,
+                getAdditionalInfo: async function (additionalOptions) {
+                    return await (0, getByID_1.getByID)(id, Object.assign({}, options, additionalOptions));
+                },
             });
         }
         const pages = document.querySelector('[data-hk="0-0-4-0-0"]');

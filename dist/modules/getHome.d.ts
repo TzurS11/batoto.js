@@ -1,4 +1,5 @@
 import { axiosProxy, sources } from "./types";
+import { GetByIDoptions, InvalidMangaInfo, MangaInfo } from "./getByID";
 type PopularUpdate = {
     poster: string;
     title: string;
@@ -7,6 +8,10 @@ type PopularUpdate = {
         name: string;
         id: string;
     };
+    /**
+     * Get more information that is not available just on the popular updates section.
+     */
+    getAdditionalInfo: (additionalOptions?: GetByIDoptions) => Promise<MangaInfo | InvalidMangaInfo>;
 };
 type LatestRelease = {
     poster: string;
@@ -18,6 +23,10 @@ type LatestRelease = {
         name: string;
         id: string;
     };
+    /**
+     * Get more information that is not available just on the latest releases section.
+     */
+    getAdditionalInfo: (additionalOptions?: GetByIDoptions) => Promise<MangaInfo | InvalidMangaInfo>;
 };
 type ValidResult = {
     /**
@@ -47,18 +56,18 @@ type InvalidResult = {
      */
     valid: false;
     /**
-   * ```js
-   * THIS MIGHT BE INVALID
-   * if (valid == false) return;
-   * ```
-   */
+     * ```js
+     * THIS MIGHT BE INVALID
+     * if (valid == false) return;
+     * ```
+     */
     popularUpdates?: never;
     /**
-   * ```js
-   * THIS MIGHT BE INVALID
-   * if (valid == false) return;
-   * ```
-   */
+     * ```js
+     * THIS MIGHT BE INVALID
+     * if (valid == false) return;
+     * ```
+     */
     latestReleases?: never;
 };
 type options = {

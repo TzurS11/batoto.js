@@ -125,3 +125,8 @@ export function convertSpecialCharsToUnicode(inputString: string) {
   const encodedString = encodeURIComponent(inputString);
   return encodedString;
 }
+
+export function convertUnicodeToSpecialChars(inputString: string) {
+  const decodedString = decodeURIComponent(inputString);
+  return decodedString;
+}

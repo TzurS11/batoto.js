@@ -1,5 +1,6 @@
 import { axiosProxy, sources } from "./types";
-type options = {
+import { ChapterResult, InvalidChapterResult, getChapterByIDoptions } from "./getChapterByID";
+export type GetByIDoptions = {
     /**
      * incase https://bato.to goes down you can chagne the domain here. lits of mirror links https://rentry.co/batoto/raw
      */
@@ -75,9 +76,13 @@ type Results = {
         name: string;
         id: string;
         timestamp: number;
+        /**
+         * Get the chapter.
+         */
+        getChapter: (additionalOptions?: getChapterByIDoptions) => Promise<ChapterResult | InvalidChapterResult>;
     }[];
 };
-type MangaInfo = {
+export type MangaInfo = {
     /**
      * the url used to get the information.
      */
@@ -91,7 +96,7 @@ type MangaInfo = {
      */
     results: Results;
 };
-type InvalidMangaInfo = {
+export type InvalidMangaInfo = {
     /**
      * the url used to get the information.
      */
@@ -113,5 +118,5 @@ type InvalidMangaInfo = {
  * @param id the id of the manga.
  * @param options Options for getting the information
  */
-export declare function getByID(id: string, options?: options): Promise<MangaInfo | InvalidMangaInfo>;
+export declare function getByID(id: string, options?: GetByIDoptions): Promise<MangaInfo | InvalidMangaInfo>;
 export {};

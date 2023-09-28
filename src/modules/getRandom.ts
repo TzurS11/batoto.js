@@ -1,6 +1,12 @@
 import axios from "axios";
 import { isMature } from "./utils";
 import { axiosProxy, sources } from "./types";
+import {
+  GetByIDoptions,
+  InvalidMangaInfo,
+  MangaInfo,
+  getByID,
+} from "./getByID";
 
 type options = {
   /**
@@ -13,6 +19,8 @@ type options = {
   proxy?: axiosProxy;
 };
 
+type AdditionalInfoOptions = {};
+
 type Result = {
   id: string;
   title: {
@@ -23,6 +31,12 @@ type Result = {
   poster: string;
   genres: string[];
   mature: boolean;
+  /**
+   * Get more information that is not available just on the random results screen.
+   */
+  getAdditionalInfo: (
+    additionalOptions?: GetByIDoptions
+  ) => Promise<MangaInfo | InvalidMangaInfo>;
 };
 
 type ValidResult = {
@@ -49,7 +63,7 @@ type InvalidResult = {
    * check if the fetch is valid and successful. always check if that is true before using results
    */
   valid: false;
-    /**
+  /**
    * ```js
    * THIS MIGHT BE INVALID
    * if (valid == false) return;
@@ -61,7 +75,6 @@ type InvalidResult = {
 /**
  * Get random mangas
  * @param options Options for getting the information.
- * @returns
  */
 export async function getRandom(
   options: options = {
@@ -235,8 +248,9 @@ export async function getRandom(
       let mature = false;
       const genres = Array.from(manga.genres, String);
       if (isMature(genres)) mature = true;
+      const id = String(manga.urlPath).replace("/title/", "");
       list.push({
-        id: String(manga.urlPath).replace("/title/", ""),
+        id,
         title: {
           original: String(manga.name),
           synonyms: Array.from(manga.altNames, String),
@@ -245,6 +259,12 @@ export async function getRandom(
         poster: String(manga.urlCoverOri),
         genres: genres,
         mature: mature,
+        getAdditionalInfo: async function (additionalOptions?: GetByIDoptions) {
+          return await getByID(
+            id,
+            Object.assign({}, options, additionalOptions)
+          );
+        },
       });
     }
 

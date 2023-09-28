@@ -1,6 +1,12 @@
 import { fetchHTML, querySelectorAllRegex, isMature } from "./utils";
 
 import { axiosProxy, sources } from "./types";
+import {
+  GetByIDoptions,
+  InvalidMangaInfo,
+  MangaInfo,
+  getByID,
+} from "./getByID";
 
 type PopularUpdate = {
   poster: string;
@@ -10,6 +16,12 @@ type PopularUpdate = {
     name: string;
     id: string;
   };
+  /**
+   * Get more information that is not available just on the popular updates section.
+   */
+  getAdditionalInfo: (
+    additionalOptions?: GetByIDoptions
+  ) => Promise<MangaInfo | InvalidMangaInfo>;
 };
 
 type LatestRelease = {
@@ -22,6 +34,12 @@ type LatestRelease = {
     name: string;
     id: string;
   };
+  /**
+   * Get more information that is not available just on the latest releases section.
+   */
+  getAdditionalInfo: (
+    additionalOptions?: GetByIDoptions
+  ) => Promise<MangaInfo | InvalidMangaInfo>;
 };
 
 type ValidResult = {
@@ -52,14 +70,14 @@ type InvalidResult = {
    * check if the scrape is valid and successful. always check if that is true before using popularUpdates or latestReleases.
    */
   valid: false;
-    /**
+  /**
    * ```js
    * THIS MIGHT BE INVALID
    * if (valid == false) return;
    * ```
    */
   popularUpdates?: never;
-    /**
+  /**
    * ```js
    * THIS MIGHT BE INVALID
    * if (valid == false) return;
@@ -123,13 +141,20 @@ export async function getHome(
           "link link-hover text-xs text-white line-clamp-1 visited:text-accent"
         )
         .item(0) as HTMLAnchorElement;
+      const id = parent_currentDiv_img.href.replace("/title/", "") || "";
       popularUpdates.push({
         poster: currentDiv_img.src || "",
         title: currentDiv_img.alt || "",
-        id: parent_currentDiv_img.href.replace("/title/", "") || "",
+        id,
         lastChapter: {
           name: lastChapterAnchor.innerHTML,
           id: lastChapterAnchor.href.replace("/title/", "") || "",
+        },
+        getAdditionalInfo: async function (additionalOptions?: GetByIDoptions) {
+          return await getByID(
+            id,
+            Object.assign({}, options, additionalOptions)
+          );
         },
       });
     }
@@ -177,14 +202,20 @@ export async function getHome(
         const currentSpan = chapterSpans[j];
         genres.push(currentSpan.innerHTML);
       }
-
+      const id = parent_currentDiv_img.href.replace("/title/", "") || "";
       latestReleases.push({
         poster: currentDiv_img.src || "",
         title: currentDiv_img.alt || "",
-        id: parent_currentDiv_img.href.replace("/title/", "") || "",
+        id,
         mature: isMature(genres),
         genres: genres,
         lastChapter: lastChapter,
+        getAdditionalInfo: async function (additionalOptions?: GetByIDoptions) {
+          return await getByID(
+            id,
+            Object.assign({}, options, additionalOptions)
+          );
+        },
       });
     }
 

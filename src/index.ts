@@ -4,6 +4,7 @@ import { getRandom } from "./modules/getRandom";
 import { searchByKeyword } from "./modules/searchByKeyword";
 import { getHome } from "./modules/getHome";
 import { isPageValid } from "./modules/utils";
+import { searchBar } from "./modules/searchBar";
 
 export { getByID } from "./modules/getByID";
 export { getChapterByID } from "./modules/getChapterByID";
@@ -11,6 +12,7 @@ export { getRandom } from "./modules/getRandom";
 export { searchByKeyword } from "./modules/searchByKeyword";
 export { getHome } from "./modules/getHome";
 export { isPageValid } from "./modules/utils";
+export { searchBar } from "./modules/searchBar";
 
 export default class Bato {
   getByID = getByID;
@@ -19,4 +21,5 @@ export default class Bato {
   searchByKeyword = searchByKeyword;
   getHome = getHome;
   isPageValid = isPageValid;
+  searchBar = searchBar;
 }

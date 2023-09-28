@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isPageValid = exports.getHome = exports.searchByKeyword = exports.getRandom = exports.getChapterByID = exports.getByID = void 0;
+exports.searchBar = exports.isPageValid = exports.getHome = exports.searchByKeyword = exports.getRandom = exports.getChapterByID = exports.getByID = void 0;
 const getByID_1 = require("./modules/getByID");
 const getChapterByID_1 = require("./modules/getChapterByID");
 const getRandom_1 = require("./modules/getRandom");
 const searchByKeyword_1 = require("./modules/searchByKeyword");
 const getHome_1 = require("./modules/getHome");
 const utils_1 = require("./modules/utils");
+const searchBar_1 = require("./modules/searchBar");
 var getByID_2 = require("./modules/getByID");
 Object.defineProperty(exports, "getByID", { enumerable: true, get: function () { return getByID_2.getByID; } });
 var getChapterByID_2 = require("./modules/getChapterByID");
@@ -19,6 +20,8 @@ var getHome_2 = require("./modules/getHome");
 Object.defineProperty(exports, "getHome", { enumerable: true, get: function () { return getHome_2.getHome; } });
 var utils_2 = require("./modules/utils");
 Object.defineProperty(exports, "isPageValid", { enumerable: true, get: function () { return utils_2.isPageValid; } });
+var searchBar_2 = require("./modules/searchBar");
+Object.defineProperty(exports, "searchBar", { enumerable: true, get: function () { return searchBar_2.searchBar; } });
 class Bato {
     getByID = getByID_1.getByID;
     getChapterByID = getChapterByID_1.getChapterByID;
@@ -26,5 +29,6 @@ class Bato {
     searchByKeyword = searchByKeyword_1.searchByKeyword;
     getHome = getHome_1.getHome;
     isPageValid = utils_1.isPageValid;
+    searchBar = searchBar_1.searchBar;
 }
 exports.default = Bato;

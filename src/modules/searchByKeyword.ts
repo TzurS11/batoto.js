@@ -13,6 +13,12 @@ import {
   status,
   axiosProxy,
 } from "./types";
+import {
+  GetByIDoptions,
+  InvalidMangaInfo,
+  MangaInfo,
+  getByID,
+} from "./getByID";
 
 type options = {
   /**
@@ -49,6 +55,21 @@ type options = {
   uploadStatus?: status;
 };
 
+type Results = {
+  id: string;
+  title: { original: string; synonyms: string[] };
+  authors: string[];
+  poster: string;
+  genres: string[];
+  mature: boolean;
+  /**
+   * Get more information that is not available just on the search screen.
+   */
+  getAdditionalInfo: (
+    additionalOptions?: GetByIDoptions
+  ) => Promise<MangaInfo | InvalidMangaInfo>;
+};
+
 type SearchResult = {
   /**
    * the search url.
@@ -61,14 +82,7 @@ type SearchResult = {
   /**
    * list of mangas found.
    */
-  results: {
-    id: string;
-    title: { original: string; synonyms: string[] };
-    authors: string[];
-    poster: string;
-    genres: string[];
-    mature: boolean;
-  }[];
+  results: Results[];
   /**
    * how many pages are in this search
    */
@@ -100,6 +114,11 @@ type InvalidSearchResult = {
   pages?: never;
 };
 
+/**
+ * search mangas by keyword
+ * @param keyword The search keyword.
+ * @param options Options for getting the information.
+ */
 export async function searchByKeyword(
   keyword: string,
   options: options = {
@@ -129,14 +148,7 @@ export async function searchByKeyword(
   const uploadStatus = (options.uploadStatus as string) || "";
   let uri = `${baseURL}/v3x-search?word=${keyword}&orig=${orig}&lang=${lang}&sort=${sort}&page=${page}&status=${workStatus}&upload=${uploadStatus}`;
   try {
-    const list: {
-      id: string;
-      title: { original: string; synonyms: string[] };
-      authors: string[];
-      poster: string;
-      genres: string[];
-      mature: boolean;
-    }[] = [];
+    const list: Results[] = [];
 
     let document = await fetchHTML(uri, options.proxy);
     if (document == null) {
@@ -223,6 +235,12 @@ export async function searchByKeyword(
             : String(poster),
         genres: currentGenres,
         mature: mature,
+        getAdditionalInfo: async function (additionalOptions?: GetByIDoptions) {
+          return await getByID(
+            id,
+            Object.assign({}, options, additionalOptions)
+          );
+        },
       });
     }
 

@@ -22,3 +22,4 @@ export declare function convertLangArrayToString(langArr: langOriginal[] | langT
  */
 export declare function isPageValid(urlString: string): boolean;
 export declare function convertSpecialCharsToUnicode(inputString: string): string;
+export declare function convertUnicodeToSpecialChars(inputString: string): string;

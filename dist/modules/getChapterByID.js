@@ -6,6 +6,7 @@ const axios_1 = require("axios");
 const fs = require("fs");
 const archiver = require("archiver");
 const path = require("path");
+const getByID_1 = require("./getByID");
 /**
  * Get all images from a chapter by id.
  * @param chapterID The id of the chapter. get chapter id from getByID
@@ -31,8 +32,13 @@ async function getChapterByID(chapterID, options = {
             if (cacheFile[chapterID]) {
                 if (cacheFile[chapterID].pages[0] != undefined &&
                     (0, utils_1.isPageValid)(cacheFile[chapterID].pages[0])) {
+                    const pages = cacheFile[chapterID].pages;
                     return {
                         ...cacheFile[chapterID],
+                        pages: pages.map((x) => unicode == true ? (0, utils_1.convertSpecialCharsToUnicode)(x) : x),
+                        getAdditionalInfo: async function (additionalOptions) {
+                            return await (0, getByID_1.getByID)(chapterID, Object.assign({}, options, additionalOptions));
+                        },
                         downloadZip: async function (path = `./downloads/${chapterID.replace(/\//g, "-")}`) {
                             if (cacheFile[chapterID].pages.length == 0)
                                 return console.error("Invalid response. check by seeing if valid is false.");
@@ -89,6 +95,9 @@ async function getChapterByID(chapterID, options = {
                 url: `${baseURL}/title/${chapterID}`,
                 valid: true,
                 pages: pages,
+                getAdditionalInfo: async function (additionalOptions) {
+                    return await (0, getByID_1.getByID)(chapterID, Object.assign({}, options, additionalOptions));
+                },
                 downloadZip: async function (path = `./downloads/${chapterID.replace(/\//g, "-")}`) {
                     return await downloadAndZipImages(pages, path);
                 },

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertSpecialCharsToUnicode = exports.isPageValid = exports.convertLangArrayToString = exports.isMature = exports.querySelectorAllRegex = exports.fetchHTML = void 0;
+exports.convertUnicodeToSpecialChars = exports.convertSpecialCharsToUnicode = exports.isPageValid = exports.convertLangArrayToString = exports.isMature = exports.querySelectorAllRegex = exports.fetchHTML = void 0;
 const jsdom_1 = require("jsdom");
 const axios_1 = require("axios");
 const url = require("url");
@@ -111,3 +111,8 @@ function convertSpecialCharsToUnicode(inputString) {
     return encodedString;
 }
 exports.convertSpecialCharsToUnicode = convertSpecialCharsToUnicode;
+function convertUnicodeToSpecialChars(inputString) {
+    const decodedString = decodeURIComponent(inputString);
+    return decodedString;
+}
+exports.convertUnicodeToSpecialChars = convertUnicodeToSpecialChars;

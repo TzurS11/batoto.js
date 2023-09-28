@@ -4,8 +4,14 @@ import * as fs from "fs";
 import * as archiver from "archiver";
 import { axiosProxy, sources } from "./types";
 import * as path from "path";
+import {
+  GetByIDoptions,
+  MangaInfo,
+  InvalidMangaInfo,
+  getByID,
+} from "./getByID";
 
-type options = {
+export type getChapterByIDoptions = {
   /**
    * incase https://bato.to goes down you can chagne the domain here. lits of mirror links https://rentry.co/batoto/raw
    */
@@ -25,7 +31,7 @@ type options = {
   proxy?: axiosProxy;
 };
 
-type ChapterResult = {
+export type ChapterResult = {
   /**
    * the url used to get the chapter.
    */
@@ -43,9 +49,15 @@ type ChapterResult = {
    * @param path the path to download the zip to. if not specified: ./downloads/{chapterID}
    */
   downloadZip: (path?: string) => Promise<void>;
+  /**
+   * Get more information that is not available just on the chapter page.
+   */
+  getAdditionalInfo: (
+    additionalOptions?: GetByIDoptions
+  ) => Promise<MangaInfo | InvalidMangaInfo>;
 };
 
-type InvalidChapterResult = {
+export type InvalidChapterResult = {
   /**
    * the url used to get the chapter.
    */
@@ -68,6 +80,13 @@ type InvalidChapterResult = {
    * ```
    */
   downloadZip?: never;
+  /**
+   * ```js
+   * THIS MIGHT BE INVALID
+   * if (valid == false) return;
+   * ```
+   */
+  getAdditionalInfo?: never;
 };
 
 /**
@@ -77,7 +96,7 @@ type InvalidChapterResult = {
  */
 export async function getChapterByID(
   chapterID: string,
-  options: options = {
+  options: getChapterByIDoptions = {
     baseURL: "https://bato.to",
     unicode: false,
     cache: false,
@@ -103,12 +122,24 @@ export async function getChapterByID(
           cacheFile[chapterID].pages[0] != undefined &&
           isPageValid(cacheFile[chapterID].pages[0])
         ) {
+          const pages = cacheFile[chapterID].pages as string[];
           return {
             ...(cacheFile[chapterID] as {
               url: string;
               valid: boolean;
               pages: string[];
             }),
+            pages: pages.map((x) =>
+              unicode == true ? convertSpecialCharsToUnicode(x) : x
+            ),
+            getAdditionalInfo: async function (
+              additionalOptions?: GetByIDoptions
+            ) {
+              return await getByID(
+                chapterID,
+                Object.assign({}, options, additionalOptions)
+              );
+            },
             downloadZip: async function (
               path = `./downloads/${chapterID.replace(/\//g, "-")}`
             ) {
@@ -181,6 +212,12 @@ export async function getChapterByID(
         url: `${baseURL}/title/${chapterID}`,
         valid: true,
         pages: pages,
+        getAdditionalInfo: async function (additionalOptions?: GetByIDoptions) {
+          return await getByID(
+            chapterID,
+            Object.assign({}, options, additionalOptions)
+          );
+        },
         downloadZip: async function (
           path = `./downloads/${chapterID.replace(/\//g, "-")}`
         ) {

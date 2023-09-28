@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getByID = void 0;
 const utils_1 = require("./utils");
+const getChapterByID_1 = require("./getChapterByID");
 function arrayFixer(arr) {
     let fixedArray = [];
     for (let i = 0; i < arr.length; i++) {
@@ -93,10 +94,14 @@ async function getByID(id, options = {
                         .item(0)
                         .getAttribute("time");
                     const timestamp = new Date(chapterTime).getTime();
+                    const id = chapter.href.replace("/title/", "");
                     chaptersArray.push({
                         name: chapter.innerHTML,
-                        id: chapter.href.replace("/title/", ""),
+                        id,
                         timestamp: timestamp,
+                        getChapter: async function (additionalOptions) {
+                            return await (0, getChapterByID_1.getChapterByID)(id, Object.assign({}, options, additionalOptions));
+                        },
                     });
                 }
             }

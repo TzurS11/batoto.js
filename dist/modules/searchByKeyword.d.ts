@@ -1,4 +1,5 @@
 import { sources, langOriginal, langTransalted, sortOrder, status, axiosProxy } from "./types";
+import { GetByIDoptions, InvalidMangaInfo, MangaInfo } from "./getByID";
 type options = {
     /**
      * Set up a rotating proxy to prevent IP blocking when you have many requests to bato.to
@@ -33,6 +34,21 @@ type options = {
      */
     uploadStatus?: status;
 };
+type Results = {
+    id: string;
+    title: {
+        original: string;
+        synonyms: string[];
+    };
+    authors: string[];
+    poster: string;
+    genres: string[];
+    mature: boolean;
+    /**
+     * Get more information that is not available just on the search screen.
+     */
+    getAdditionalInfo: (additionalOptions?: GetByIDoptions) => Promise<MangaInfo | InvalidMangaInfo>;
+};
 type SearchResult = {
     /**
      * the search url.
@@ -45,17 +61,7 @@ type SearchResult = {
     /**
      * list of mangas found.
      */
-    results: {
-        id: string;
-        title: {
-            original: string;
-            synonyms: string[];
-        };
-        authors: string[];
-        poster: string;
-        genres: string[];
-        mature: boolean;
-    }[];
+    results: Results[];
     /**
      * how many pages are in this search
      */
@@ -85,5 +91,10 @@ type InvalidSearchResult = {
      */
     pages?: never;
 };
+/**
+ * search mangas by keyword
+ * @param keyword The search keyword.
+ * @param options Options for getting the information.
+ */
 export declare function searchByKeyword(keyword: string, options?: options): Promise<SearchResult | InvalidSearchResult>;
 export {};

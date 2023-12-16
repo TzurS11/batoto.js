@@ -201,7 +201,7 @@ export async function getByID(
       case "ltr":
         readDirection = "Left to Right";
         break;
-      case "ltr":
+      case "rtl":
         readDirection = "Right to Left";
         break;
       case "ttb":

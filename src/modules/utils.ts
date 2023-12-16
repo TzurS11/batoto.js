@@ -10,7 +10,7 @@ import * as url from "url";
  */
 export async function fetchHTML(
   url: string,
-  proxy: axiosProxy
+  proxy?: axiosProxy
 ): Promise<Document | null> {
   url.replace("https", "http");
   try {

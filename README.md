@@ -1,54 +1,72 @@
-# batoto.js
+<h1 align="center">Welcome to batoto.js 👋</h1>
 
-[![npm version](https://badge.fury.io/js/batoto.js.svg)](https://badge.fury.io/js/batoto.js) [![npm downloads](https://img.shields.io/npm/dw/batoto.js)](https://www.npmjs.com/package/batoto.js) [![GitHub license](https://img.shields.io/github/license/TzurS11/batoto.js)](https://github.com/TzurS11/batoto.js/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/TzurS11/batoto.js.svg?style=social)](https://github.com/TzurS11/batoto.js)
 
-Scrape data from bato.to
-Download and stream mangas. search by name, author, get information about a manga.
 
-## DISCLAMER
+<p align="center">
+  <a href="https://www.npmjs.com/package/batoto.js" target="_blank">
+    <img alt="Version" src="https://img.shields.io/npm/v/batoto.js.svg">
+  </a>
+  <a href="https://github.com/TzurS11/batoto.js#readme" target="_blank">
+    <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
+  </a>
+  <a href="https://github.com/TzurS11/batoto.js/graphs/commit-activity" target="_blank">
+    <img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" />
+  </a>
+  <a href="https://github.com/TzurS11/batoto.js/blob/master/LICENSE" target="_blank">
+    <img alt="License: MIT" src="https://img.shields.io/github/license/TzurS11/batoto.js" />
+  </a>
+</p>
 
-Please be aware that the use of this web scraping tool to extract data from the bato.to website **may potentially violate the website's Terms of Service**. I do not endorse or encourage activities that breach the TOS of any website.
+### ✨ [Demo](https://batotojs.tzurs11.repl.co)
 
-Before using this tool, it is your responsibility to review and comply with bato.to's Terms of Service, which may prohibit or restrict web scraping activities. If you choose to proceed with web scraping using this tool, you do so **at your own risk**, and you should be aware of the potential legal and ethical implications.
+## Install
 
-## Javascript example:
+```sh
+npm install batoto.js
+```
+
+## example
 Always check if valid property is true. Doesn't matter what you are using this package for.
 
 ```js
-const { getByID, getChapterByID, searchByKeyword } = require("batoto.js");
+const { getByID, getChapterByID, searchByKeyword } = require("batoto.js"); //Javascript
+//import { getByID, getChapterByID, searchByKeyword } from "batoto.js"; //Typescript
 
-async function main() {
+async function getFirstChapter(title) {
   //searching by manga name
-  let search = await searchByKeyword("jinx", 1);
+  let search = await searchByKeyword(title, 1);
 
   //check if there are results.
   if (!search.valid) {
-    return console.log("No results found.");
+    // No results found.
+    return [];
   }
 
-  //top result is index 0
+  //finished searching. top result is index 0
   let topResult = search.results[0];
-  console.log("finished searching. Top result: " + topResult.title.original);
 
   // get information about the search by its id. this includes chapters
   let topManga = await getByID(topResult.id);
   if (!topResult.valid) {
-    return console.log("Error getting the manga with the specified id.");
+    // "Error getting the manga with the specified id."
+    return [];
   }
-  console.log("got manga, all chapters");
+  // got manga and all chapters
 
   // get list of images from the chapter. this might take a second to load
   let chapter = await getChapterByID(topManga.chapters[0].id);
   if (!chapter.valid) {
-    return console.log("Error getting the chapters with the specified chapter ID.");
+    // Error getting the chapters with the specified chapter ID.
+    return [];
   }
-  console.log(chapter.pages);
+  return chapter.pages;
 }
-main();
+// returns empty array if no results were found or there is an error.
+// returns string arrray if there are pages for a chapter.
+getFirstChapter("Demon Slayer");
 ```
 
-## Express server:
+## Express server
 
 ```js
 const {
@@ -121,4 +139,11 @@ app.listen(PORT, (error) => {
 
 from here you can integrate this into anything you like. An api, a discord bot, and more.
 
-### Please report issues in the github repo. this is a web scraping tool for bato.to and not an api so it might happen regularly.
+## Show your support
+
+Give a ⭐️ if this project helped you!
+
+## 📝 License
+
+Copyright © 2023 [TzurS11](https://github.com/TzurS11).<br />
+This project is [MIT](https://github.com/TzurS11/batoto.js/blob/master/LICENSE) licensed.

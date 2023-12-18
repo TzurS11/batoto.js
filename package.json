@@ -1,6 +1,6 @@
 {
   "name": "batoto.js",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Scrape data from bato.to",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

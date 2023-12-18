@@ -96,8 +96,8 @@ export function convertLangArrayToString(
 }
 
 /**
- * check if an image is still valid. can be tested on one of the pages in a chapter to check if the image is expired
- * @param url the address of the image.
+ * check if an image is still valid. can be tested on one of the pages in a chapter to check if the chapter is expired
+ * @param url the url address of the image.
  */
 export function isPageValid(urlString: string): boolean {
   const parsedUrl = url.parse(urlString, true);

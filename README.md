@@ -1,4 +1,5 @@
-<h1 align="center">Welcome to batoto.js 👋</h1>
+<h1 align="center"><img src="https://github.com/TzurS11/batoto.js/assets/90769470/62d35d4b-ed82-4c90-adde-8723ad8e7a62" width="1000"></h1>
+
 
 
 
@@ -6,7 +7,7 @@
   <a href="https://www.npmjs.com/package/batoto.js" target="_blank">
     <img alt="Version" src="https://img.shields.io/npm/v/batoto.js.svg">
   </a>
-  <a href="https://github.com/TzurS11/batoto.js#readme" target="_blank">
+  <a href="https://github.com/TzurS11/batoto.js?tab=readme-ov-file#example" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
   </a>
   <a href="https://github.com/TzurS11/batoto.js/graphs/commit-activity" target="_blank">
@@ -16,8 +17,6 @@
     <img alt="License: MIT" src="https://img.shields.io/github/license/TzurS11/batoto.js" />
   </a>
 </p>
-
-### ✨ [Demo](https://batotojs.tzurs11.repl.co)
 
 ## Install
 
@@ -67,6 +66,7 @@ getFirstChapter("Demon Slayer");
 ```
 
 ## Express server
+### ✨ [Demo](https://batotojs.tzurs11.repl.co)
 
 ```js
 const {

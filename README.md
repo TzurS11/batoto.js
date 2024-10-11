@@ -16,6 +16,7 @@
   <a href="https://github.com/TzurS11/batoto.js/blob/master/LICENSE" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/github/license/TzurS11/batoto.js" />
   </a>
+  <img alt="Test run" src="https://github.com/tzurs11/batoto.js/actions/workflows/node.js.yml/badge.svg">
 </p>
 
 ## Install

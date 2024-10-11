@@ -125,11 +125,11 @@ out
 .yarn/install-state.gz
 .pnp.*
 
-# test folder
-src/test
-test.ts
-test.js
-tests
+# # test folder
+# src/test
+# test.ts
+# test.js
+# tests
 # cache folder
 cache
 

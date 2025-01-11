@@ -1,7 +1,10 @@
+> [!WARNING]
+>
+> # Deprecated! use [MangaScrape](https://github.com/TzurS11/MangaScrape) instead.
+
+<br>
+
 <h1 align="center"><img src="https://github.com/TzurS11/batoto.js/assets/90769470/62d35d4b-ed82-4c90-adde-8723ad8e7a62" width="1000"></h1>
-
-
-
 
 <p align="center">
   <a href="https://www.npmjs.com/package/batoto.js" target="_blank">
@@ -16,6 +19,7 @@
   <a href="https://github.com/TzurS11/batoto.js/blob/master/LICENSE" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/github/license/TzurS11/batoto.js" />
   </a>
+  <img alt="Test run" src="https://github.com/tzurs11/batoto.js/actions/workflows/node.js.yml/badge.svg">
 </p>
 
 ## Install
@@ -25,6 +29,7 @@ npm install batoto.js
 ```
 
 ## example
+
 Always check if valid property is true. Doesn't matter what you are using this package for.
 
 ```js
@@ -66,6 +71,7 @@ getFirstChapter("Demon Slayer");
 ```
 
 ## Express server
+
 ### ✨ [Demo](https://batotojs.tzurs11.repl.co)
 
 ```js
